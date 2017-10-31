@@ -1,0 +1,197 @@
+
+	function readImage() {
+	document.getElementById("demo").innerHTML = "Paragraph changed.";
+	var inputFile = document.getElementById("image_input");
+	if (inputFile.files && inputFile.files.length) {
+		if (typeof FileReader !== "undefined") {
+			var fileReader = new FileReader();
+			fileReader.onload = function() {
+			resize(event.target.result);
+			document.getElementById("preview_image").src = event.target.result;
+		};
+		fileReader.readAsDataURL(inputFile.files[0]);
+		} else {
+			alert("Sorry, your browser doesn't support the FileReader API.");
+		}
+	} else {
+		
+	}
+	
+	
+		var MAX_HEIGHT = 20;
+	function resize(src){
+	var image = new Image();
+	image.onload = function(){
+		var canvas = document.getElementById("myCanvas");
+		if(image.height > MAX_HEIGHT) {
+			image.width *= MAX_HEIGHT / image.height;
+			image.height = MAX_HEIGHT;
+		}
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		canvas.width = image.width;
+		canvas.height = image.height;
+		ctx.drawImage(image, 0, 0, image.width, image.height);
+	};
+	image.src = src;
+	}
+
+	
+	function readImage(src) {
+	//	Prevent any non-image file type from being read.
+	if(!src.type.match(/image.*/)){
+		console.log("The dropped file is not an image: ", src.type);
+		return;
+	}
+
+	//	Create our FileReader and run the results through the render function.
+	var reader = new FileReader();
+	reader.onload = function(e){
+		document.getElementById("preview_image").src = e.target.result;
+		resize(e.target.result);
+		
+	};
+	reader.readAsDataURL(src);
+	}
+	
+	-------------------------------
+	
+	
+	
+	
+	
+	
+	
+	function uploadFile() {
+	var file = document.getElementById('attachmentFile').files[0];
+	if(file != undefined) {
+	if(file.size <= maxFileSize) {
+	attachmentName = file.name;
+	var fileReader = new FileReader();
+	fileReader.onloadend = function(e) {
+	var tempImg = new Image();
+	var dataURL;
+	tempImg.src = this.result;
+	tempImg.onload = function() {
+		var MAX_WIDTH = 400;
+		var MAX_HEIGHT = 300;
+		var tempW = tempImg.width;
+		var tempH = tempImg.height;
+		if (tempW > tempH) {
+			if (tempW > MAX_WIDTH) {
+			tempH *= MAX_WIDTH / tempW;
+			tempW = MAX_WIDTH;
+			}
+		} else {
+		if (tempH > MAX_HEIGHT) {
+            tempW *= MAX_HEIGHT / tempH;
+            tempH = MAX_HEIGHT;
+        }
+    }
+    var canvas = document.getElementById('myCanvas');
+	canvas.width = tempW;
+	canvas.height = tempH;
+	var ctx = canvas.getContext("2d");
+            ctx.drawImage(this, 0, 0, tempW, tempH); 
+    attachment = canvas.toDataURL("image/jpeg");                
+    attachment = attachment.slice(23);
+    positionIndex=0;
+    fileSize = attachment.length;
+             //this is a function to post the data
+    uploadAttachment(null);
+         };              
+ } 
+     fileReader.readAsDataURL(file);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	---------------
+	
+	
+	
+	
+	
+	
+	var MAX_WIDTH = 20;
+	var MAX_HEIGHT = 20;
+	var maxFileSize = 100000;
+	var attachmentName = "";
+	
+	
+	function resize(src){
+	var image = new Image();
+	image.onload = function(){
+		var canvas = document.getElementById("myCanvas");
+		if(image.height > MAX_HEIGHT) {
+			image.width *= MAX_HEIGHT / image.height;
+			image.height = MAX_HEIGHT;
+		}
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		canvas.width = image.width;
+		canvas.height = image.height;
+		ctx.drawImage(image, 0, 0, image.width, image.height);
+		
+		dataurl = canvas.toDataURL("image/png");
+	};
+	image.src = src;
+	}
+
+	
+	function readImage() {
+	var inputFile = document.getElementById("image_input").files[0];
+	
+	//	Prevent any non-image file type from being read.
+	if(!inputFile.type.match(/image.*/)){
+		console.log("The dropped file is not an image: ", inputFile.type);
+		return;
+	}
+
+	//	Create our FileReader and run the results through the render function.
+	var reader = new FileReader();
+	reader.onload = function(e){
+		
+		resize(e.target.result);
+		document.getElementById("preview_image").src = e.target.result;
+		
+		
+	};
+	reader.readAsDataURL(inputFile);
+	}
+	
+	
+	
+	
+	
+	
+	Anzeige Mobil: ?!?!? wurde aber dann anders angezeigt als am Desktop, Textbreite
+	deshalb viewport gelöscht
+	
+<head>
+	<meta charset="utf-8">
+	<link rel="shortcut icon" href="/favicon0.ico">
+	<title>{{page_title}}</title>
+	<meta name="description" content="pygl-page">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/styles.css?v=1.0">
+	<style type="text/css">
+	.pre {white-space: pre;}
+	.nowrap {white-space: nowrap;}
+	.pre-wrap {white-space: pre-wrap;}
+	.pre-line {white-space: pre-line;}
+	p {font: 16px Verdana;}
+	</style>
+</head>
+	
+	
+	
+	
+	
+	

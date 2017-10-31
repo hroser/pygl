@@ -1,0 +1,76 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>py.gl - Put it online</title>
+	<meta name="description" content="pygl page - create free micro pages">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css"></style>
+	<script src='https://www.google.com/recaptcha/api.js'></script>
+	<script>
+       function onSubmit(token) {
+         document.getElementById("edit-form").submit();
+       }
+     </script>
+</head>
+
+<body>
+	<form id="edit-form" method="POST" enctype="multipart/form-data">
+		<div>
+			<label>
+				Title:
+				<input type="text" name="page_title" value="{{page_title}}">
+			</label>
+		</div>
+		<div>
+			<label>
+				<p>Text:</p>
+				 <textarea style="font: 16px Verdana;" name="page_text0" cols="50" rows="12" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text0}}</textarea>
+			</label>
+		</div>
+		<div>
+			<label>
+				Image:
+				<input type="file" name="page_image" accept="image/*">
+			</label>
+		</div>
+		<div>
+			<label>
+				<p>Text:</p>
+				 <textarea style="font: 16px Verdana;" name="page_text1" cols="50" rows="12" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text1}}</textarea>
+			</label>
+		</div>
+		<div>
+			<label>
+				<p>Url:</p>
+				<input type="text" name="page_uri" value="{{page_uri}}" readonly>
+			</label>
+		</div>
+		<div>
+			<label>
+				Comments active:
+				<input type="checkbox" name="comments_active" value="comments_active" {{comments_checked}}>
+			</label>
+		</div>
+		<br><br>
+		<div>
+		<p>
+			<label>
+				Password:
+				<input type="password" name="password">
+				<input type="hidden" name="save_page" value="True">
+			</label>
+		</p>
+		</div>
+		<div>
+		 <button
+		class="g-recaptcha"
+		data-sitekey="6Le1hicUAAAAAKPxxf4c3xJn61w5Za78csRVWjlS"
+		data-callback="onSubmit">
+		Save
+		</button>
+		</div>
+	</form>
+</body>
+</html>

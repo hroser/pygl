@@ -1,0 +1,88 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<link rel="shortcut icon" href="/favicon0.ico">
+	<title>{{page_title}}</title>
+	<meta name="description" content="pygl-page">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/styles.css?v=1.0">
+	<style type="text/css">
+	.pre {white-space: pre;}
+	.nowrap {white-space: nowrap;}
+	.pre-wrap {white-space: pre-wrap;}
+	.pre-line {white-space: pre-line;}
+	p {font: 16px Verdana;}
+	</style>
+</head>
+
+<body>
+	<div>
+	<h1>{{page_title}}</h1>
+	</div>
+	<div class="pre-wrap"><p>
+{{page_text0}}
+	</p></div>
+	{% if image_id0 %}
+	<div>
+	<img src="/r/image?q={{image_id0}}" alt="picture">
+	<br><br>
+	</div>
+	{% endif %}
+	<div class="pre-wrap"><p>
+{{page_text1}}
+	</p></div>
+	<br><br>
+	<div><a href="/{{pygl_uri}}/edit"> Edit page</a></div>
+	<br><br>
+	<div><a href="/{{pygl_uri}}/report-abuse"> Report abuse</a></div>
+	<br><br>
+	views: {{page_views}}, created: {{page_created}}, last edited: {{page_last_edit}}
+	<br><br>
+	
+	{% if page_views >= 20 %}
+	
+	<div>
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+	<!-- pygl-page-01 -->
+	<ins class="adsbygoogle"
+	     style="display:block"
+	     data-ad-client="ca-pub-7721448403959102"
+	     data-ad-slot="2178889147"
+	     data-ad-format="auto"></ins>
+	<script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+	</script>
+	</div>
+	
+	{% endif %}
+	
+	{% if comments_active == True %}
+	
+	<br><br>
+	<div id="disqus_thread"></div>
+	<script>
+	
+	/**
+	*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+	*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+	/*
+	var disqus_config = function () {
+	this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+	this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+	};
+	*/
+	(function() { // DON'T EDIT BELOW THIS LINE
+	var d = document, s = d.createElement('script');
+	s.src = 'https://pygl.disqus.com/embed.js';
+	s.setAttribute('data-timestamp', +new Date());
+	(d.head || d.body).appendChild(s);
+	})();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+	
+	{% endif %}
+	
+</body>
+</html>

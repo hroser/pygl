@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<link rel="shortcut icon" href="/favicon0.ico">
+	<title>py.gl - Put it online</title>
+	<meta name="description" content="pygl page - create free micro pages">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css"></style>
+	<script src='https://www.google.com/recaptcha/api.js'></script>
+	<script>
+       function onSubmit(token) {
+         document.getElementById("report-form").submit();
+       }
+     </script>
+</head>
+
+<body>
+	<form id="report-form" method="POST" enctype="multipart/form-data">
+		Report abuse for page
+		<br>
+		py.gl/{{page_uri}}
+		<br>
+		<p>
+		<label>comment:</label>
+		<textarea name="abuse_report_comment" cols="50" rows="12" ></textarea>
+		</p>
+		<div>
+		<button
+		class="g-recaptcha"
+		data-sitekey="6Le1hicUAAAAAKPxxf4c3xJn61w5Za78csRVWjlS"
+		data-callback="onSubmit">
+		Send
+		</button>
+		</div>
+	</form>
+</body>
+</html>

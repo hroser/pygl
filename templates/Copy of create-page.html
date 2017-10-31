@@ -1,0 +1,140 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>py.gl - Put it online</title>
+	<meta name="description" content="pygl page - create free micro pages">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css"></style>
+	<script src='https://www.google.com/recaptcha/api.js'></script>
+	<script>
+function handleFiles()
+{
+    var filesToUpload = document.getElementById('input').files;
+    var file = filesToUpload[0];
+
+    // Create an image
+    var img = document.createElement("img");
+    // Create a file reader
+    var reader = new FileReader();
+    // Set the image once loaded into file reader
+    reader.onload = function(e)
+    {
+        img.src = e.target.result;
+
+        var canvas = document.createElement("canvas");
+        //var canvas = $("<canvas>", {"id":"testing"})[0];
+        //var ctx = canvas.getContext("2d");
+        //ctx.drawImage(img, 0, 0);
+
+        var MAX_WIDTH = 400;
+        var MAX_HEIGHT = 300;
+        var width = img.width;
+        var height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        var dataurl = canvas.toDataURL("image/png");
+        document.getElementById('image').src = dataurl;
+        
+        // AUTO DOWNLOAD THE IMAGES, ONCES RESIZED.
+                            var a = document.createElement('a');
+                            a.href = canvas.toDataURL("image/png");
+                            a.download = 'sample.jpg';
+                            document.body.appendChild(a);
+                            a.click();
+        
+    }
+    // Load files into file reader
+    reader.readAsDataURL(file);
+
+
+    
+    
+}</script>
+
+	
+	
+</head>
+
+<body>
+	<form id="create-form" method="POST" enctype="multipart/form-data">
+		<div>
+			<label>
+				<p>
+				<input type="text" name="page_title" placeholder="Title">
+				<canvas id="myCanvas" width="200" height="100"></canvas>
+				<p id="demo">A Paragraph.</p>
+				</p>
+			</label>
+		</div>
+		<div>
+			<label>
+
+				<p>
+				 <textarea style="font: 16px Verdana;" name="page_text0" cols="50" rows="12" placeholder="Text&#10;&#10;&#10;Tips:&#10;&#10;- *Text between asterisks* will be displayed in bold&#10;&#10;- Create multiple pygl-pages and link them with:&#10;py.gl/my-page-2" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}"></textarea>
+				</p>
+			</label>
+		</div>
+		<div>
+			<label>
+				Image:
+				<input type="file" name="page_image" accept="image/*" id="input" onchange="handleFiles()">
+				
+			</label>
+		</div>
+		<img id="image" src="" alt=""/>
+		<div>
+			<label>
+				<p>
+				 <textarea style="font: 16px Verdana;" name="page_text1" cols="50" rows="12" placeholder="Text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}"></textarea>
+				</p>
+			</label>
+		</div>
+		<div>
+			<label>
+				<p>Url:</p>
+				py.gl / <input type="text" name="page_uri" placeholder="my-page">
+			</label>
+		</div>
+		<div>
+			<label>
+				Comments active:
+				<input type="checkbox" name="comments_active" value="comments_active" checked>
+			</label>
+		</div>
+		<div>
+		<p>
+			<label>
+				Password:
+				<input type="password" name="page_password" placeholder="set password">
+				<br>
+			</label>
+			<label>
+				Retype password:
+				<input type="password" name="page_repassword" placeholder="retype password">
+			</label>
+		</p>
+		</div>
+		<div class="g-recaptcha" data-sitekey="6LdFmiEUAAAAAGrbm1QfbqbKjhfBpjCXHnsY7vPi"></div>
+		<div>
+		 <input type="submit" value="Put it online"/>
+		</div>
+	</form>
+</body>
+</html>

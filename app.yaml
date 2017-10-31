@@ -1,0 +1,41 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+  
+- url: /favicon0\.ico
+  static_files: favicon0.ico
+  upload: favicon0\.ico
+  
+- url: /favicon1\.ico
+  static_files: favicon1.ico
+  upload: favicon1\.ico
+  
+- url: /favicon2\.ico
+  static_files: favicon2.ico
+  upload: favicon2\.ico
+  
+- url: /favicon3\.ico
+  static_files: favicon3.ico
+  upload: favicon3\.ico
+  
+- url: /favicon10\.ico
+  static_files: favicon10.ico
+  upload: favicon10\.ico
+  
+- url: /robots\.txt
+  static_files: robots.txt
+  upload: robots\.txt
+  
+- url: /.*
+  script: main.app
+  secure: always
+  
+libraries:
+- name: jinja2
+  version: latest
+

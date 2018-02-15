@@ -1,12 +1,28 @@
 <!doctype html>
 
 <html lang="en">
+
+<style type="text/css">
+
+body {
+font-family: sans-serif;
+width: 500px;
+margin: 0 auto;
+}
+
+.error {
+color: red;
+font: 14px sans-serif;
+}
+
+</style>
+
 <head>
 	<meta charset="utf-8">
 	<link rel="shortcut icon" href="/favicon0.ico">
 	<title>py.gl - Put it online</title>
 	<meta name="description" content="pygl page - create free micro pages">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=720">
 	<style type="text/css"></style>
 	<script src='https://www.google.com/recaptcha/api.js'></script>
 	<script>
@@ -18,12 +34,16 @@
 
 <body>
 	<form id="report-form" method="POST" enctype="multipart/form-data">
-		Report abuse for page
-		<br>
-		py.gl/{{page_uri}}
+		<br><br><br><br><br><br>
+		Report problem with page:
+		<br><br>
+		{% if (page_uri != "") %}
+		{{page_uri}}.py.gl
+		{% else %}
+		<input type="text" name="page_uri"> .py.gl
+		{% endif %}
 		<br>
 		<p>
-		<label>comment:</label>
 		<textarea name="abuse_report_comment" cols="50" rows="12" ></textarea>
 		</p>
 		<div>

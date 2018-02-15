@@ -9,10 +9,17 @@ def format_text_bold(text_inputstring):
 	text_outputstring = "<b>"+text_string[1:-1]+"</b>"
 	return text_outputstring
 	
+def format_text_center(text_inputstring):
+	text_string = text_inputstring.group()
+	text_outputstring = "<center>"+text_string[2:-2]+"</center>"
+	return text_outputstring
+	
 def format_text_links(text_inputstring):
 	text_string = text_inputstring.group()
 	if text_string[0:4] == "http":
 		text_outputstring = "<a href=\"" + text_string + "\">" + text_string + "</a>"
+	elif (text_string.find('@') >= 0):
+		text_outputstring = "<a href=\"mailto:" + text_string + "\">" + text_string + "</a>"
 	else:
 		text_outputstring = "<a href=\"http://" + text_string + "\">" + text_string + "</a>"
 	return text_outputstring

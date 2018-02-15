@@ -1,11 +1,48 @@
 <!doctype html>
 
 <html lang="en">
+
+<style type="text/css">
+
+body {
+font-family: sans-serif;
+width: 640px;
+margin: 0 auto;
+}
+
+textarea {
+width: 640px;
+height: 60px;
+resize: none;
+overflow: hidden;
+min-height: 25px;
+}
+
+.error {
+color: red;
+font: 14px sans-serif;
+}
+
+.center {
+margin: 0 auto;
+text-align: center;
+}
+
+.centertable {
+margin-left:55px; 
+}
+
+table, tr, td {
+    border: none;
+}
+
+</style>
+
 <head>
 	<meta charset="utf-8">
-	<title>py.gl - Put it online</title>
-	<meta name="description" content="pygl page - create free micro pages">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{page_title}} (Edit)</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=720">
 	<style type="text/css"></style>
 	<script src='https://www.google.com/recaptcha/api.js'></script>
 	<script>
@@ -13,64 +50,372 @@
          document.getElementById("edit-form").submit();
        }
      </script>
+	<script>
+	function handleFiles(image_id)
+	{	var file;
+	    if (image_id === '0') {
+	      file = document.getElementById('image_input0').files[0];
+	    } else if (image_id === '1') {
+	      file = document.getElementById('image_input1').files[0];
+	    } else {
+	      file = document.getElementById('image_input2').files[0];
+	    }
+		if(file != undefined) {
+		if(file.type.match(/image.*/)){
+	    // Create an image
+	    var image = new Image();
+	    image.src = 
+	    image.onload = function()
+	    {
+	     
+	        //var canvas = $("<canvas>", {"id":"testing"})[0];
+	        //var ctx = canvas.getContext("2d");
+	        //ctx.drawImage(img, 0, 0);
+	
+	        var MAX_WIDTH = 480;
+	        var MAX_HEIGHT = 480;
+	        var width = image.width;
+	        var height = image.height;
+	        
+	        //document.getElementById("demo").innerHTML = file.type;
+	        //document.getElementById("demo2").innerHTML = image.width;
+	
+	        if (width > height) {
+	          if (width > MAX_WIDTH) {
+	            height *= MAX_WIDTH / width;
+	            width = MAX_WIDTH;
+	          }
+	        } else {
+	          if (height > MAX_HEIGHT) {
+	            width *= MAX_HEIGHT / height;
+	            height = MAX_HEIGHT;
+	          }
+	        }
+	        var canvas = document.createElement("canvas");
+	        canvas.width = width;
+	        canvas.height = height;
+	        var ctx = canvas.getContext("2d");
+	        ctx.drawImage(image, 0, 0, width, height);
+	
+	        var dataurl = canvas.toDataURL("image/jpeg");
+	        
+			//document.getElementById("demo").innerHTML = dataurl;
+			
+			
+			var fd = new FormData();
+			fd.append("name", "paul");
+			fd.append("dataurl", dataurl);
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "http://py.gl/r/upload");
+			//xhr.open("POST", "https://pygl-page.appspot.com/r/upload");
+			//xhr.open("POST", "https://8080-dot-2973034-dot-devshell.appspot.com/r/upload");
+			
+			xhr.onload = function () {
+			  if (xhr.readyState === 4) {
+			    if (xhr.status === 200) {
+			      console.log(xhr.responseText);
+			      //document.getElementById("demo").innerHTML = xhr.responseText;
+			      if (image_id === '0') {
+				      document.getElementById("image_id0").value = xhr.responseText;
+				      document.getElementById('preview_image0').src = dataurl;
+				      document.getElementById('image_input0').value= null; 
+			      } else if (image_id === '1') {
+			          document.getElementById("image_id1").value = xhr.responseText;
+				      document.getElementById('preview_image1').src = dataurl;
+				      document.getElementById('image_input1').value= null; 
+			      } else {
+				      document.getElementById("image_id2").value = xhr.responseText;
+				      document.getElementById('preview_image2').src = dataurl;
+				      document.getElementById('image_input2').value= null; 
+				  }
+			      
+			    } else {
+			      console.error(xhr.statusText);
+			      //document.getElementById("demo").innerHTML = xhr.statusText;
+			    }
+			  }
+			};
+			
+			xhr.send(fd);
+			
+	        
+	    };
+	    
+	    
+	    // Create a file reader
+	    var reader = new FileReader();
+	    // Set the image once loaded into file reader
+	    reader.onload = function()
+	    {
+	    	//document.getElementById('preview_image').src = event.target.result;
+	    	//var image = document.createElement("img");
+	    	
+	        image.src = event.target.result;
+	      
+	    };
+	    // Load files into file reader
+	    reader.readAsDataURL(file);
+	    }
+	    else
+	    {
+	    // document.getElementById("demo").innerHTML = "not image type";
+	    }
+	    }
+	    else
+	    {
+	    // document.getElementById("demo").innerHTML = "file undefined";
+	    }
+	    
+	}
+	
+function deleteImage(image_id){
+	if (image_id === '0') {
+		document.getElementById("image_id0").value = null;
+		document.getElementById('preview_image0').src = null;
+		document.getElementById('image_input0').value= null; 
+	} else if (image_id === '1') {
+		document.getElementById("image_id1").value = null;
+		document.getElementById('preview_image1').src = null;
+		document.getElementById('image_input1').value= null;
+	}else {
+		document.getElementById("image_id2").value = null;
+		document.getElementById('preview_image2').src = null;
+		document.getElementById('image_input2').value= null; 
+	}
+}
+	
+function autosize(element) {
+
+    var scrollLeft = window.pageXOffset ||
+   (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+
+   var scrollTop  = window.pageYOffset ||
+   (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+    element.style.height = "5px";
+    element.style.height = (element.scrollHeight + 10)+"px";
+    
+   window.scrollTo(scrollLeft, scrollTop);
+    
+}
+
+
+function autosizeall() {
+	var element;
+	element = document.getElementById("page_text0");
+	if (element.innerHTML !== "") {autosize(element);}
+	element = document.getElementById("page_text1");
+	if (element.innerHTML !== "") {autosize(element);}
+}
+
+var delayTimerUrl;
+function checkUrl(urlString){
+clearTimeout(delayTimerUrl);
+    delayTimerUrl = setTimeout(function() {
+    document.getElementById("urlinfo").innerHTML = urlString;
+    }, 1200); // Will do the check after 1200 ms
+}
+	
+	
+function useExtendedForm(){
+	document.getElementById('extendedform').style.display = 'block';
+	document.getElementById('simpleform').style.display = 'none';
+	return false;
+}
+
+function useSimpleForm(){
+	document.getElementById('extendedform').style.display = 'none';
+	document.getElementById('simpleform').style.display = 'block';
+	return false;
+}
+	
+	</script>
 </head>
 
-<body>
+<body onload=autosizeall()>
 	<form id="edit-form" method="POST" enctype="multipart/form-data">
 		<div>
 			<label>
-				Title:
-				<input type="text" name="page_title" value="{{page_title}}">
+			<!-- <p  id="demo">para</p> -->
+			<!-- <p  id="demo2">para</p> -->
+				<p>
+				<br><br>
+				<input type="text" style="font: 30px sans-serif;font-weight: bold;text-align: center; width: 640px;" name="page_title" placeholder="Title" value="{{page_title}}">
+				{% if err_title == True %}
+				Please insert a title, text or image
+				{% endif %}
+				</p>
 			</label>
 		</div>
+		<br>
+		<div class="center">
+			{% if image_id0 %}
+			<img id="preview_image0" src="/r/image?q={{image_id0}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image0" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage0">
+				<input type="file" style="display: none; name="page_image0" accept="image/*" id="image_input0" onchange="handleFiles('0')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input0').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('0')" />
+				{% if image_id0 %}
+				<input type="hidden" value="{{image_id0}}" name="image_id0" id="image_id0">
+				{% else %}
+				<input type="hidden" name="image_id0" id="image_id0">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
 		<div>
 			<label>
-				<p>Text:</p>
-				 <textarea style="font: 16px Verdana;" name="page_text0" cols="50" rows="12" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text0}}</textarea>
+				<p>
+				 <textarea style="font: 16px sans-serif;" name="page_text0" id="page_text0" oninput="autosize(this)" placeholder="Text -- use *bold* for bold text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text0}}</textarea>
+				</p>
 			</label>
 		</div>
+		
+		<div class="center">
+			{% if image_id1 %}
+			<img id="preview_image1" src="/r/image?q={{image_id1}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image1" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage1">
+				<input type="file" style="display: none; name="page_image1" accept="image/*" id="image_input1" onchange="handleFiles('1')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input1').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('1')" />
+				{% if image_id1 %}
+				<input type="hidden" value="{{image_id1}}" name="image_id1" id="image_id1">
+				{% else %}
+				<input type="hidden" name="image_id1" id="image_id1">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
 		<div>
 			<label>
-				Image:
-				<input type="file" name="page_image" accept="image/*">
+				<p>
+				 <textarea style="font: 16px sans-serif;" name="page_text1" id="page_text1" oninput="autosize(this)" placeholder="Text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text1}}</textarea>
+				</p>
 			</label>
 		</div>
+		
+		<div class="center">
+			{% if image_id2 %}
+			<img id="preview_image2" src="/r/image?q={{image_id2}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image2" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage2">
+				<input type="file" style="display: none; name="page_image2" accept="image/*" id="image_input2" onchange="handleFiles('2')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input2').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('2')" />
+				{% if image_id2 %}
+				<input type="hidden" value="{{image_id2}}" name="image_id2" id="image_id2">
+				{% else %}
+				<input type="hidden" name="image_id2" id="image_id2">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
 		<div>
 			<label>
-				<p>Text:</p>
-				 <textarea style="font: 16px Verdana;" name="page_text1" cols="50" rows="12" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text1}}</textarea>
+				<p>
+				<textarea style="font: 16px sans-serif;" name="page_text2" id="page_text2" oninput="autosize(this)" placeholder="Text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text2}}</textarea>
+				</p>
 			</label>
 		</div>
-		<div>
-			<label>
-				<p>Url:</p>
-				<input type="text" name="page_uri" value="{{page_uri}}" readonly>
-			</label>
+		
+
+		
+		<div class="centertable">
+			<table>
+			<col width="250">
+			<col width="250">
+			<tr>
+				<td>
+				Show comments on your page:<br>
+				</td>
+				<td>
+				<label>
+					<input type="checkbox" name="comments_active" value="comments_active" {{comments_checked}}>
+				</label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				Email for password recovery:
+				</td>
+				<td>
+				<label>
+					<input type="text" style="font: 16px sans-serif; width: 260px;" name="page_email" placeholder="(optional)" value="{{page_email}}">
+				</label>
+				</td>
+			<tr>
+			<tr>
+				<td>
+				Enter password:
+				</td>
+				<td>
+				<label>
+					<input type="password" style="font: 16px sans-serif; width: 260px;" name="password" placeholder="">
+					{% if err_password_retype == True %}
+					wrong password
+					{% endif %}
+					<input type="hidden" name="save_page" value="True">
+				</label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				Save changes:
+				</td>
+				<td>
+				<button
+				class="g-recaptcha" style="font: 15px sans-serif;"
+				data-sitekey="6Le1hicUAAAAAKPxxf4c3xJn61w5Za78csRVWjlS"
+				data-callback="onSubmit">
+				Save
+				</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<br>
+				</td>
+				<td>
+				<br>
+				<div class = "error">
+				{% if err_captcha == True %}
+				sorry, recaptcha failed
+				{% endif %}
+				{% if err_wrong_password == True %}
+					Sorry, you entered a wrong password.
+				{% endif %}
+				{% if err_password_locked == True %}
+					Sorry, a wrong password was entered three times, please wait 10 minutes.
+				{% endif %}
+				</div>
+				</td>
+			</tr>
+			</table>
 		</div>
-		<div>
-			<label>
-				Comments active:
-				<input type="checkbox" name="comments_active" value="comments_active" {{comments_checked}}>
-			</label>
+		<div class="center">
+			<br><br>
+			<a href="/r/delete" style="color: black;font-weight: normal;">Delete page</a>
 		</div>
-		<br><br>
-		<div>
-		<p>
-			<label>
-				Password:
-				<input type="password" name="password">
-				<input type="hidden" name="save_page" value="True">
-			</label>
-		</p>
-		</div>
-		<div>
-		 <button
-		class="g-recaptcha"
-		data-sitekey="6Le1hicUAAAAAKPxxf4c3xJn61w5Za78csRVWjlS"
-		data-callback="onSubmit">
-		Save
-		</button>
-		</div>
+		
+		<br>
+		
+		
+		
 	</form>
+	<br><br><br><br>
 </body>
 </html>

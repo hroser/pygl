@@ -101,6 +101,12 @@ margin-bottom: 15px
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style type="text/css"></style>
 	<script src='https://www.google.com/recaptcha/api.js'></script>
+  <script src='tinymce/js/tinymce/tinymce.min.js'></script>
+  <script>
+  tinymce.init({
+    selector: 'textarea'
+  });
+  </script>
 	
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109506841-1"></script>
@@ -379,7 +385,7 @@ function useSimpleForm(){
 			<img id="preview_image0" src="" alt=""/><br>
 			{% endif %}
 			<label id="label_loadimage0">
-				<input type="file" style="display: none; name="page_image0" accept="image/*" id="image_input0" onchange="handleFiles('0')">
+				<input type="file" style="display: none" name="page_image0" accept="image/*" id="image_input0" onchange="handleFiles('0')">
 				<input type="button" value="Select image" onclick="document.getElementById('image_input0').click();" />
 				<input type="button" value="Delete image" onclick="deleteImage('0')" />
 				{% if image_id0 %}

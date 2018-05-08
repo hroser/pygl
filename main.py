@@ -129,10 +129,10 @@ class MainPage(Handler):
 		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 		try:
-        	gcs_file = gcs.open('/' + bucket_name + '/pages/' + 'pygl', 'r')
+			gcs_file = gcs.open('/' + bucket_name + '/pages/' + 'pygl', 'r')
 			landing_text = b64decode(gcs_file.read())
 			gcs_file.close()
-        except:
+		except:
 			pass
 
 		#self.response.out.write(self.request.headers.get('Accept-Language'))
@@ -356,19 +356,13 @@ class PyglPageEdit(Handler):
 		save_page = self.request.get('save_page')
 		
 		#page_title = self.request.get('page_title')
-		#page_text0 = self.request.get('page_text0')
+		page_text0 = self.request.get('page_text0')
 		#page_text1 = self.request.get('page_text1')
 		#page_text2 = self.request.get('page_text2')
 		#page_image_id0 = self.request.get('image_id0')
 		#page_image_id1 = self.request.get('image_id1')
 		#page_image_id2 = self.request.get('image_id2')
 		
-		# load from bucket
-		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
-		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
-		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'r')
-		page_text0 = b64decode(gcs_file.read())
-		gcs_file.close()
 		
 		page_email = self.request.get('page_email')
 		if self.request.get('comments_active'):
@@ -379,7 +373,7 @@ class PyglPageEdit(Handler):
 		if (page.login_fails_consec >= 3) and ((datetime.datetime.utcnow() - page.login_fail_last) < datetime.timedelta(minutes=10)):
 			err_password_locked = True;
 			if (save_page == "True"):
-				self.render('edit-page', page_title=page_title, page_text0=page_text0, page_text1=page_text1, page_text2=page_text2, image_id0 = page_image_id0, image_id1 = page_image_id1, image_id2 = page_image_id2, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
+				self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 			else:
 				self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 			return
@@ -390,7 +384,7 @@ class PyglPageEdit(Handler):
 		else:
 			err_wrong_password = True;
 			if (save_page == "True"):
-				self.render('edit-page', page_title=page_title, page_text0=page_text0, page_text1=page_text1, page_text2=page_text2, image_id0 = page_image_id0, image_id1 = page_image_id1, image_id2 = page_image_id2, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
+				self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 			else:
 				self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 			page.login_fails_consec = page.login_fails_consec + 1
@@ -450,7 +444,15 @@ class PyglPageEdit(Handler):
 				comments_checked = "checked"
 			else:
 				comments_checked = ""
-			self.render('edit-page', page_title=page.title, page_text0=page.text0, page_text1=page.text1, page_text2=page.text2, image_id0 = page.image_id0, image_id1 = page.image_id1, image_id2 = page.image_id2, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
+				
+			# load from bucket
+			bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+			# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+			gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'r')
+			page_text0 = b64decode(gcs_file.read())
+			gcs_file.close()
+				
+			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 		
 class PyglReportAbuse(Handler):
 	def get(self, requested_uri = ""):

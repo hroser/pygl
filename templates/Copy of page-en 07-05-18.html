@@ -6,7 +6,7 @@
 
 body {
 font-family: sans-serif;
-max-width: 800px;
+max-width: 640px;
 margin: 0 auto;
 }
 
@@ -67,7 +67,7 @@ margin-left: 3%;
 <head>
 	<meta charset="utf-8">
 	<link rel="shortcut icon" href="/favicon0.ico">
-	<title>{{pygl_uri}}.py.gl</title>
+	<title>{{page_title}}</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
@@ -88,24 +88,65 @@ margin-left: 3%;
 <body>
 	<div>
 	
-	{% if (page_text0 and page_text0 != "") %}
+	{% if (page_title and page_title != "") %}
 	<br>
-	<div>
-	{{page_text0|safe}}
+	<h1 align="center">{{page_title}}</h1>
 	</div>
 	{% endif %}
 	
+	{% if (image_id0 and image_id0 != "") %}
+	<br>
+	<div class="center">
+	<img src="/r/image?q={{image_id0}}" alt="picture">
+	</div>
+	{% endif %}
+	
+	{% if (page_text0 and page_text0 != "") %}
+	<br>
+	<div class="pre-wrap">
+{{page_text0}}
+	</div>
+	{% endif %}
+	
+	{% if (image_id1 and image_id1 != "") %}
+	<br>
+	<div class="center">
+	<img src="/r/image?q={{image_id1}}" alt="picture">
+	</div>
+	{% endif %}
+	
+	{% if (page_text1 and page_text1 != "") %}
+	<br>
+	<div class="pre-wrap">
+{{page_text1}}
+	</div>
+	{% endif %}
+	
+	{% if (image_id2 and image_id2 != "") %}
+	<br>
+	<div class="center">
+	<img src="/r/image?q={{image_id2}}" alt="picture">
+	</div>
+	{% endif %}
+	
+	{% if (page_text2 and page_text2 != "") %}
+	<br>
+	<div class="pre-wrap">
+{{page_text2}}
+	</div>
+	{% endif %}
 
 	<div class="pagetext">
-	<br><br><br>
+	<br><br>
 	views: {{page_views}}, created: {{page_created}}, last edited: {{page_last_edit}},      
 	<a href="/r/report-page" style="color: black;font-weight: normal;">Report page</a>, 
-	<a href="/r/edit" style="color: black;font-weight: normal;">Edit page</a>, 
-	created with <a href="https://py.gl" style="color: black;font-weight: normal;">py.gl</a>
-	<br><br><br>
+	<a href="/r/edit" style="color: black;font-weight: normal;">Edit page</a>
+	<br><br>
+	<a href="https://py.gl" style="color: black;font-weight: normal;">Create your own pygl-page</a>
+	<br><br>
 	</div>
 	
-	{% if page_views >= 0 %}
+	{% if page_views >= 100 %}
 	
 	<br><br>
 	<div>

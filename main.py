@@ -23,7 +23,6 @@ from webapp2_extras import routes
 # for logging
 import logging
 
-
 # for working with regular expressions
 import re
 
@@ -114,17 +113,24 @@ class Handler(webapp2.RequestHandler):
 		"""
 		template = template + '-en.html'
 		# undo escaping of <b> and </b>
-		output = self.render_str(template, **kw).replace("&lt;b&gt;","<b>").replace("&lt;/b&gt;","</b>")
+		#output = self.render_str(template, **kw).replace("&lt;b&gt;","<b>").replace("&lt;/b&gt;","</b>")
 		# undo escaping of <center> and </center>
-		output = output.replace("&lt;center&gt;","<center>").replace("&lt;/center&gt;","</center>")
+		#output = output.replace("&lt;center&gt;","<center>").replace("&lt;/center&gt;","</center>")
 		# undo escaping of </a>, "> and < a href=\"
-		output = output.replace("&lt;/a&gt;","</a>").replace("&#34;&gt;","\">").replace("&lt;a href=&#34;","<a href=\"")
+		#output = output.replace("&lt;/a&gt;","</a>").replace("&#34;&gt;","\">").replace("&lt;a href=&#34;","<a href=\"")
+		output = self.render_str(template, **kw)
 		self.write(output)
 
 class MainPage(Handler):
 	def get(self):
+		key = ndb.Key(Pyglpage, "pygl")
+		page = key.get()
+		landing_text = ""
+		if page:
+			landing_text = page.text0
+
 		#self.response.out.write(self.request.headers.get('Accept-Language'))
-		self.render('create-page', comments_checked="checked")
+		self.render('create-page', page_text0 = landing_text, comments_checked="checked")
 		
 		#logging.info("hello")
 		
@@ -136,13 +142,15 @@ class MainPage(Handler):
 		err_passwort_format = False
 		err_password_retype = False
 		err_captcha = False
+		
+		
 	
 		page_uri = self.request.get('page_uri')
 		page_uri_val = pt.validate_uri(page_uri)
-		page_title = self.request.get('page_title')
+		#page_title = self.request.get('page_title')
 		page_text0 = self.request.get('page_text0')
-		page_text1 = self.request.get('page_text1')
-		page_text2 = self.request.get('page_text2')
+		#page_text1 = self.request.get('page_text1')
+		#page_text2 = self.request.get('page_text2')
 		if self.request.get('comments_active'):
 			comments_active = True
 			comments_checked = "checked"		# for reloading page when error
@@ -153,9 +161,9 @@ class MainPage(Handler):
 		page_repassword = self.request.get('page_repassword')
 		page_email = self.request.get('page_email')
 		
-		page_image_id0 = self.request.get('image_id0')	
-		page_image_id1 = self.request.get('image_id1')	
-		page_image_id2 = self.request.get('image_id2')	
+		#page_image_id0 = self.request.get('image_id0')	
+		#page_image_id1 = self.request.get('image_id1')	
+		#page_image_id2 = self.request.get('image_id2')	
 		#logging.info("image_id0:"+page_image_id0+" image_id1:"+page_image_id1+" image_id2:"+page_image_id2)
 		
 		
@@ -176,8 +184,8 @@ class MainPage(Handler):
 			err_password_retype = True
 			
 		if (err_uri_not_available == True) or (err_title == True) or (err_password_retype == True) or (err_uri_invalid == True) or (err_passwort_format == True):
-			self.render('create-page', page_title = page_title, page_text0 = page_text0, page_text1 = page_text1, 
-				page_text2 = page_text2, image_id0 = page_image_id0, image_id1 = page_image_id1, image_id2 = page_image_id2, page_uri = page_uri, comments_checked=comments_checked, page_email = page_email, err_uri_not_available=err_uri_not_available, 
+			self.render('create-page', page_text0 = page_text0,  
+				page_uri = page_uri, comments_checked=comments_checked, page_email = page_email, err_uri_not_available=err_uri_not_available, 
 				err_title=err_title, err_password_retype=err_password_retype, err_uri_invalid=err_uri_invalid, 
 				err_passwort_format=err_passwort_format, err_captcha=err_captcha)
 			return
@@ -196,19 +204,19 @@ class MainPage(Handler):
 		pygl_page.pygl_uri = page_uri_val
 		pygl_page.password_hash = pt.make_pw_hash(page_id, page_password)
 		pygl_page.email = page_email
-		pygl_page.title = page_title
+		#pygl_page.title = page_title
 		pygl_page.text0 = page_text0
-		pygl_page.text1 = page_text1
-		pygl_page.text2 = page_text2
+		#pygl_page.text1 = page_text1
+		#pygl_page.text2 = page_text2
 		pygl_page.comments_active = comments_active
 		pygl_page.login_fails_consec = 0
 		pygl_page.abuse_report_count = 0
 		
 		
 		# save image id in page datastore entity
-		pygl_page.image_id0 = page_image_id0
-		pygl_page.image_id1 = page_image_id1
-		pygl_page.image_id2 = page_image_id2
+		#pygl_page.image_id0 = page_image_id0
+		#pygl_page.image_id1 = page_image_id1
+		#pygl_page.image_id2 = page_image_id2
 		
 		
 		page_views = Pageviews(id=page_id)
@@ -235,15 +243,16 @@ class MainPage(Handler):
 				# redirect string must be str, no unicode
 				self.redirect(str(redirect_string))
 			else:
+				logging.info("recaptche not successful: " + json.dumps(result))
 				err_captcha = True
-				self.render('create-page', page_title = page_title, page_text0 = page_text0, page_text1 = page_text1, 
-					page_text2 = page_text2, image_id0 = page_image_id0, image_id1 = page_image_id1, image_id2 = page_image_id2, page_uri = page_uri, comments_checked=comments_checked, page_email = page_email, err_uri_not_available=err_uri_not_available, 
+				self.render('create-page', page_text0 = page_text0, 
+					page_uri = page_uri, comments_checked=comments_checked, page_email = page_email, err_uri_not_available=err_uri_not_available, 
 					err_title=err_title, err_password_retype=err_password_retype, err_uri_invalid=err_uri_invalid, 
 					err_passwort_format=err_passwort_format, err_captcha=err_captcha)
 		else:
 			err_captcha = True
-			self.render('create-page', page_title = page_title, page_text0 = page_text0, page_text1 = page_text1, 
-				page_text2 = page_text2, image_id0 = page_image_id0, image_id1 = page_image_id1, image_id2 = page_image_id2, page_uri = page_uri, comments_checked=comments_checked, page_email = page_email, err_uri_not_available=err_uri_not_available, 
+			self.render('create-page', page_text0 = page_text0, 
+				page_uri = page_uri, comments_checked=comments_checked, page_email = page_email, err_uri_not_available=err_uri_not_available, 
 				err_title=err_title, err_password_retype=err_password_retype, err_uri_invalid=err_uri_invalid, 
 				err_passwort_format=err_passwort_format, err_captcha=err_captcha)
 		''' End reCAPTCHA validation '''
@@ -267,18 +276,18 @@ class PyglPage(Handler):
 			return
 		
 		#format text
-		page_text_formatted0 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text0)
-		page_text_formatted0 = re.sub(r"\*\*(.*?)\*\*", pt.format_text_center, page_text_formatted0, flags=re.DOTALL)
-		page_text_formatted0 = re.sub(r"\*(.*?)\*", pt.format_text_bold, page_text_formatted0, flags=re.DOTALL)
+		#page_text_formatted0 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text0)
+		#page_text_formatted0 = re.sub(r"\*\*(.*?)\*\*", pt.format_text_center, page_text_formatted0, flags=re.DOTALL)
+		#page_text_formatted0 = re.sub(r"\*(.*?)\*", pt.format_text_bold, page_text_formatted0, flags=re.DOTALL)
 		
-		page_text_formatted1 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text1)
-		page_text_formatted1 = re.sub(r"\*\*(.*?)\*\*", pt.format_text_center, page_text_formatted1, flags=re.DOTALL)
-		page_text_formatted1 = re.sub(r"\*(.*?)\*", pt.format_text_bold, page_text_formatted1, flags=re.DOTALL)
+		#page_text_formatted1 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text1)
+		#page_text_formatted1 = re.sub(r"\*\*(.*?)\*\*", pt.format_text_center, page_text_formatted1, flags=re.DOTALL)
+		#page_text_formatted1 = re.sub(r"\*(.*?)\*", pt.format_text_bold, page_text_formatted1, flags=re.DOTALL)
 		
-		page_text_formatted2 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text2)
-		page_text_formatted2 = re.sub(r"\*\*(.*?)\*\*", pt.format_text_center, page_text_formatted2, flags=re.DOTALL)
-		page_text_formatted2 = re.sub(r"\*(.*?)\*", pt.format_text_bold, page_text_formatted2, flags=re.DOTALL)
-		
+		#page_text_formatted2 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text2)
+		#page_text_formatted2 = re.sub(r"\*\*(.*?)\*\*", pt.format_text_center, page_text_formatted2, flags=re.DOTALL)
+		#page_text_formatted2 = re.sub(r"\*(.*?)\*", pt.format_text_bold, page_text_formatted2, flags=re.DOTALL)
+		#
 		#######################
 		
 		# could cause performance issue, only about 5 writes per seconds
@@ -296,7 +305,7 @@ class PyglPage(Handler):
 		
 		########################
 		
-		self.render('page', page_title=page.title, page_text0=page_text_formatted0, page_text1=page_text_formatted1, page_text2=page_text_formatted2, comments_active = page.comments_active, page_views=page_views.views, page_created = page.created.date(), page_last_edit = page.last_edit.date(), pygl_uri=page.pygl_uri, image_id0=page.image_id0, image_id1=page.image_id1, image_id2=page.image_id2)
+		self.render('page', page_text0=page.text0, comments_active = page.comments_active, page_views=page_views.views, page_created = page.created.date(), page_last_edit = page.last_edit.date(), pygl_uri=page.pygl_uri)
 		
 		return
 		

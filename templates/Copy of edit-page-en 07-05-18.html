@@ -6,7 +6,7 @@
 
 body {
 font-family: sans-serif;
-width: 800px;
+width: 640px;
 margin: 0 auto;
 }
 
@@ -40,7 +40,7 @@ table, tr, td {
 
 <head>
 	<meta charset="utf-8">
-	<title>{{page_uri}}.py.gl (Edit)</title>
+	<title>{{page_title}} (Edit)</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=720">
 	<style type="text/css"></style>
@@ -50,63 +50,6 @@ table, tr, td {
          document.getElementById("edit-form").submit();
        }
      </script>
-     
-     
-     <script src='/tinymce/js/tinymce/tinymce.min.js'></script>
-  <script>
-  tinymce.init({
-    selector: '#maintextarea',
-    height: 500,
-    theme: "modern",
-    plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern autoresize',
-  	toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-	image_dimensions: false,
-
-  	// enable automatic uploads of images represented by blob or data URIs
-  	automatic_uploads: true,
-  	// URL of our upload handler (for more details check: https://www.tinymce.com/docs/configure/file-image-upload/#images_upload_url)
-  	// images_upload_url: 'postAcceptor.php',
-  	// here we add custom filepicker only to Image dialog
-  	file_picker_types: 'image', 
-  	// and here's our custom image picker
-  	file_picker_callback: function(cb, value, meta) {
-    	var input = document.createElement('input');
-    	input.setAttribute('type', 'file');
-    	input.setAttribute('accept', 'image/*');
-	    
-	    // Note: In modern browsers input[type="file"] is functional without 
-	    // even adding it to the DOM, but that might not be the case in some older
-	    // or quirky browsers like IE, so you might want to add it to the DOM
-	    // just in case, and visually hide it. And do not forget do remove it
-	    // once you do not need it anymore.
-	
-	    input.onchange = function() {
-	      var file = this.files[0];
-	      
-	      var reader = new FileReader();
-	      reader.onload = function () {
-	      	
-	        // Note: Now we need to register the blob in TinyMCEs image blob
-	        // registry. In the next release this part hopefully won't be
-	        // necessary, as we are looking to handle it internally.
-	        var id = 'blobid' + (new Date()).getTime();
-	        var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-	        var base64 = reader.result.split(',')[1];
-	        var blobInfo = blobCache.create(id, file, base64);
-	        blobCache.add(blobInfo);
-	
-	        // call the callback and populate the Title field with the file name
-	        cb(blobInfo.blobUri(), { title: file.name });
-	      };
-	      reader.readAsDataURL(file);
-	    };
-	    
-	    input.click();
-	}
-  	
-  });
-  </script>
-     
 	<script>
 	function handleFiles(image_id)
 	{	var file;
@@ -285,31 +228,110 @@ function useSimpleForm(){
 	document.getElementById('simpleform').style.display = 'block';
 	return false;
 }
-
-function jumptoanchor(anchor){
-	if (anchor !== '' && anchor !== undefined)
-	{
-		location.href="#" + anchor;
-	}
-	}
 	
 	</script>
 </head>
 
-<body onload=jumptoanchor("{% if (err_uri_invalid == True) or (err_password_retype == True) or (err_uri_not_available == True) or (err_passwort_format == True) or (err_captcha == True)%}pub{% endif %}")>
+<body onload=autosizeall()>
 	<form id="edit-form" method="POST" enctype="multipart/form-data">
-		
+		<div>
+			<label>
+			<!-- <p  id="demo">para</p> -->
+			<!-- <p  id="demo2">para</p> -->
+				<p>
+				<br><br>
+				<input type="text" style="font: 30px sans-serif;font-weight: bold;text-align: center; width: 640px;" name="page_title" placeholder="Title" value="{{page_title}}">
+				{% if err_title == True %}
+				Please insert a title, text or image
+				{% endif %}
+				</p>
+			</label>
+		</div>
+		<br>
+		<div class="center">
+			{% if image_id0 %}
+			<img id="preview_image0" src="/r/image?q={{image_id0}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image0" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage0">
+				<input type="file" style="display: none; name="page_image0" accept="image/*" id="image_input0" onchange="handleFiles('0')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input0').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('0')" />
+				{% if image_id0 %}
+				<input type="hidden" value="{{image_id0}}" name="image_id0" id="image_id0">
+				{% else %}
+				<input type="hidden" name="image_id0" id="image_id0">
+				{% endif %}
+			</label>
+		</div>
 		
 		<br>
 		
 		<div>
 			<label>
 				<p>
-				 <textarea id="maintextarea" style="font: 16px sans-serif;" name="page_text0" id="page_text0">{{page_text0|safe}}</textarea>
+				 <textarea style="font: 16px sans-serif;" name="page_text0" id="page_text0" oninput="autosize(this)" placeholder="Text -- use *bold* for bold text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text0}}</textarea>
 				</p>
 			</label>
 		</div>
-		<a name="pub"></a>
+		
+		<div class="center">
+			{% if image_id1 %}
+			<img id="preview_image1" src="/r/image?q={{image_id1}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image1" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage1">
+				<input type="file" style="display: none; name="page_image1" accept="image/*" id="image_input1" onchange="handleFiles('1')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input1').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('1')" />
+				{% if image_id1 %}
+				<input type="hidden" value="{{image_id1}}" name="image_id1" id="image_id1">
+				{% else %}
+				<input type="hidden" name="image_id1" id="image_id1">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
+		<div>
+			<label>
+				<p>
+				 <textarea style="font: 16px sans-serif;" name="page_text1" id="page_text1" oninput="autosize(this)" placeholder="Text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text1}}</textarea>
+				</p>
+			</label>
+		</div>
+		
+		<div class="center">
+			{% if image_id2 %}
+			<img id="preview_image2" src="/r/image?q={{image_id2}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image2" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage2">
+				<input type="file" style="display: none; name="page_image2" accept="image/*" id="image_input2" onchange="handleFiles('2')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input2').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('2')" />
+				{% if image_id2 %}
+				<input type="hidden" value="{{image_id2}}" name="image_id2" id="image_id2">
+				{% else %}
+				<input type="hidden" name="image_id2" id="image_id2">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
+		<div>
+			<label>
+				<p>
+				<textarea style="font: 16px sans-serif;" name="page_text2" id="page_text2" oninput="autosize(this)" placeholder="Text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text2}}</textarea>
+				</p>
+			</label>
+		</div>
+		
 
 		
 		<div class="centertable">
@@ -318,7 +340,7 @@ function jumptoanchor(anchor){
 			<col width="250">
 			<tr>
 				<td>
-				Show comments:<br>
+				Show comments on your page:<br>
 				</td>
 				<td>
 				<label>
@@ -328,7 +350,7 @@ function jumptoanchor(anchor){
 			</tr>
 			<tr>
 				<td>
-				Email:
+				Email for password recovery:
 				</td>
 				<td>
 				<label>

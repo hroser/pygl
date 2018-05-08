@@ -6,7 +6,7 @@
 
 body {
 font-family: sans-serif;
-max-width: 800px;
+max-width: 640px;
 margin: 0 auto;
 }
 
@@ -101,23 +101,15 @@ margin-bottom: 15px
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style type="text/css"></style>
 	<script src='https://www.google.com/recaptcha/api.js'></script>
-	<script>
-       function onSubmit(token) {
-         //gtag_report_conversion();
-         //gtag('event', 'conversion', {'send_to': 'AW-960369895/AbmyCImgkHkQ56n4yQM'});
-         document.getElementById("create-form").submit();
-       }
-    </script>
-	
-	<script src='/tinymce/js/tinymce/tinymce.min.js'></script>
+  <script src='/tinymce/js/tinymce/tinymce.min.js'></script>
   <script>
   tinymce.init({
-    selector: '#maintextarea',
+    selector: 'textarea',
     height: 500,
     theme: "modern",
-    plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern autoresize',
+    plugins: 'print preview fullpage searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern help',
   	toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-	image_dimensions: false,
+  	
 
   	// enable automatic uploads of images represented by blob or data URIs
   	automatic_uploads: true,
@@ -142,7 +134,6 @@ margin-bottom: 15px
 	      
 	      var reader = new FileReader();
 	      reader.onload = function () {
-	      	
 	        // Note: Now we need to register the blob in TinyMCEs image blob
 	        // registry. In the next release this part hopefully won't be
 	        // necessary, as we are looking to handle it internally.
@@ -184,6 +175,13 @@ margin-bottom: 15px
 	}
 	</script>
 
+	<script>
+       function onSubmit(token) {
+         //gtag_report_conversion();
+         gtag('event', 'conversion', {'send_to': 'AW-960369895/AbmyCImgkHkQ56n4yQM'});
+         document.getElementById("create-form").submit();
+       }
+     </script>
 	<script>
 	function handleFiles(image_id)
 	{	var file;
@@ -390,34 +388,138 @@ function useSimpleForm(){
 	return false;
 }
 
-function jumptoanchor(anchor){
-	if (anchor !== '' && anchor !== undefined)
-	{
-		location.href="#" + anchor;
-	}
-}
-
 	
 	</script>
 </head>
 
-<body onload=jumptoanchor("{% if (err_uri_invalid == True) or (err_password_retype == True) or (err_uri_not_available == True) or (err_passwort_format == True) or (err_captcha == True)%}pub{% endif %}")>
+<body onload=autosizeall()>
 	<form id="create-form" method="POST" enctype="multipart/form-data">
-	<br><br>
+	<br>
+	<h1 align="center">py.gl</h1>
+	<br>
+	<div class="centertopinfo">
+		
+		<center>
+		Create a clean and fast one-page website:<br><br>
+		Insert text - Select images - Publish
+		<br><br><br>
+		You can share <b>YourPage.py.gl</b> immediately!
+		<br>
+		</center>
+		<br>
+	</div>
+	
 		<div>
 			<label>
+			<!-- <p  id="demo">para</p> -->
+			<!-- <p  id="demo2">para</p> -->
 				<p>
-				<textarea id="maintextarea" style="font: 16px sans-serif;" name="page_text0" id="page_text0">{{page_text0}}</textarea>
+				<br><br>
+				<input type="text" class="title" name="page_title" placeholder="Title" value="{{page_title}}">
+				<div class="error">
+				{% if err_title == True %}
+				Please insert a title, text or image
+				{% endif %}
+				</div>
 				</p>
 			</label>
 		</div>
-		<a name="pub"></a>
+		<br>
+		<div class="center">
+			{% if image_id0 %}
+			<img id="preview_image0" src="/r/image?q={{image_id0}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image0" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage0">
+				<input type="file" style="display: none" name="page_image0" accept="image/*" id="image_input0" onchange="handleFiles('0')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input0').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('0')" />
+				{% if image_id0 %}
+				<input type="hidden" value="{{image_id0}}" name="image_id0" id="image_id0">
+				{% else %}
+				<input type="hidden" name="image_id0" id="image_id0">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
+		<div>
+			<label>
+				<p>
+				<textarea style="font: 16px sans-serif;" name="page_text0" id="page_text0" oninput="autosize(this)" placeholder="Text - you can use *text* for bold text and **text** for centering" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text0}}</textarea>
+				</p>
+			</label>
+		</div>
+		
+		<div class="center">
+			{% if image_id1 %}
+			<img id="preview_image1" src="/r/image?q={{image_id1}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image1" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage1">
+				<input type="file" style="display: none; name="page_image1" accept="image/*" id="image_input1" onchange="handleFiles('1')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input1').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('1')" />
+				{% if image_id1 %}
+				<input type="hidden" value="{{image_id1}}" name="image_id1" id="image_id1">
+				{% else %}
+				<input type="hidden" name="image_id1" id="image_id1">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
+		<div>
+			<label>
+				<p>
+				 <textarea style="font: 16px sans-serif;" name="page_text1" id="page_text1" oninput="autosize(this)" placeholder="Text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text1}}</textarea>
+				</p>
+			</label>
+		</div>
+		
+		<div class="center">
+			{% if image_id2 %}
+			<img id="preview_image2" src="/r/image?q={{image_id2}}" alt=""/><br>
+			{% else %}
+			<img id="preview_image2" src="" alt=""/><br>
+			{% endif %}
+			<label id="label_loadimage2">
+				<input type="file" style="display: none; name="page_image2" accept="image/*" id="image_input2" onchange="handleFiles('2')">
+				<input type="button" value="Select image" onclick="document.getElementById('image_input2').click();" />
+				<input type="button" value="Delete image" onclick="deleteImage('2')" />
+				{% if image_id2 %}
+				<input type="hidden" value="{{image_id2}}" name="image_id2" id="image_id2">
+				{% else %}
+				<input type="hidden" name="image_id2" id="image_id2">
+				{% endif %}
+			</label>
+		</div>
+		
+		<br>
+		
+		<div>
+			<label>
+				<p>
+				<textarea style="font: 16px sans-serif;" name="page_text2" id="page_text2" oninput="autosize(this)" placeholder="Text" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{{page_text1}}</textarea>
+				</p>
+			</label>
+		</div>
 		
 		<br><br><br>
-
+		
+		<center>
+		<b>
+		Publish your website:
+		</b>
+		</center>
+		<br><br>
 		<div class="centertable">
 			<div class="createpagelabel">
-			Website URL:
+			Choose your page address:
 			</div>
 			<div class="createpageinput">
 				<input type="text" style="text-align: right;font: 16px sans-serif; width: 220px;" name="page_uri" placeholder="my-page" value="{{page_uri}}" onkeyup="checkUrl(this.value)"> .py.gl
@@ -436,14 +538,14 @@ function jumptoanchor(anchor){
 			</div>
 			
 			<div class="createpagelabel">
-			Show comments:
+			Show comments on your page:
 			</div>
 			<div class="createpageinput">
 				<input type="checkbox" name="comments_active" value="comments_active" {{comments_checked}}>
 			</div>
 			
 			<div class="createpagelabel">
-			Set password:
+			Set a password:
 			</div>
 			<div class="createpageinput">
 				<input type="password" style="font: 16px sans-serif; width: 260px;" name="page_password" placeholder="">
@@ -456,7 +558,7 @@ function jumptoanchor(anchor){
 			</div>
 			
 			<div class="createpagelabel">
-			Confirm password:
+			Confirm your password:
 			</div>
 			<div class="createpageinput">
 				<input type="password" style="font: 16px sans-serif; width: 260px;" name="page_repassword" placeholder="">
@@ -469,21 +571,21 @@ function jumptoanchor(anchor){
 			</div>
 			
 			<div class="createpagelabel">
-			Email:
+			Email for password recovery:
 			</div>
 			<div class="createpageinput">
 				<input type="text" style="font: 16px sans-serif; width: 260px;" name="page_email" placeholder="(optional)" value="{{page_email}}">
 			</div>
 			
 			<div class="createpagelabel">
-			Publish website:
+			Put your page online:
 			</div>
 			<div class="createpageinput">
 				<button
-				class="g-recaptcha" style="font: 15px sans-serif;width:100px;"
+				class="g-recaptcha" style="font: 15px sans-serif;"
 				data-sitekey="6Le1hicUAAAAAKPxxf4c3xJn61w5Za78csRVWjlS"
-				data-callback="onSubmit">
-				OK
+				data-callback="onSubmit" >
+				Put it online
 				</button>
 				<br>
 				<div class="error">
@@ -492,6 +594,10 @@ function jumptoanchor(anchor){
 					{% endif %}
 				</div>
 			</div>
+			
+			
+			
+			
 			
 		</div>
 		<br>
@@ -516,19 +622,6 @@ function jumptoanchor(anchor){
 		
 		
 	</form>
-	<br><br>
-	<div>
-	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-	<!-- pygl-page-01 -->
-	<ins class="adsbygoogle"
-	     style="display:block"
-	     data-ad-client="ca-pub-7721448403959102"
-	     data-ad-slot="2178889147"
-	     data-ad-format="auto"></ins>
-	<script>
-	(adsbygoogle = window.adsbygoogle || []).push({});
-	</script>
-	</div>
-	<br><br>
+	<br><br><br><br>
 </body>
 </html>

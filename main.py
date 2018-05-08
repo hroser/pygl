@@ -123,16 +123,20 @@ class Handler(webapp2.RequestHandler):
 
 class MainPage(Handler):
 	def get(self):
-		key = ndb.Key(Pyglpage, "pygl")
-		page = key.get()
+	
 		landing_text = ""
-		if page:
-			landing_text = page.text0
+		# load from bucket
+		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+		try:
+        	gcs_file = gcs.open('/' + bucket_name + '/pages/' + 'pygl', 'r')
+			landing_text = b64decode(gcs_file.read())
+			gcs_file.close()
+        except:
+			pass
 
 		#self.response.out.write(self.request.headers.get('Accept-Language'))
 		self.render('create-page', page_text0 = landing_text, comments_checked="checked")
-		
-		#logging.info("hello")
 		
 	def post(self):
 
@@ -205,7 +209,7 @@ class MainPage(Handler):
 		pygl_page.password_hash = pt.make_pw_hash(page_id, page_password)
 		pygl_page.email = page_email
 		#pygl_page.title = page_title
-		pygl_page.text0 = page_text0
+		#pygl_page.text0 = page_text0
 		#pygl_page.text1 = page_text1
 		#pygl_page.text2 = page_text2
 		pygl_page.comments_active = comments_active
@@ -225,7 +229,7 @@ class MainPage(Handler):
 		
 		datastore_image = Pageimage()
 		datastore_image.pygl_id = page_id
-		
+
 
 		''' Begin reCAPTCHA validation '''
 		recaptcha_response = self.request.get('g-recaptcha-response')
@@ -238,7 +242,14 @@ class MainPage(Handler):
 			response = urllib2.urlopen(req)
 			result = json.load(response)
 			if result['success']:
+				# write datastore
 				pygl_page.put()
+				# write file in bucket
+				bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+				# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+				gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(page_id), 'w', content_type='text/html')
+				gcs_file.write(b64encode(page_text0))
+				gcs_file.close()
 				redirect_string = 'http://' + page_uri_val + '.py.gl'
 				# redirect string must be str, no unicode
 				self.redirect(str(redirect_string))
@@ -274,6 +285,13 @@ class PyglPage(Handler):
 		if (page.pygl_uri != requested_uri):
 			self.redirect("/" + page.pygl_uri)
 			return
+			
+		# load from bucket
+		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(requested_id), 'r')
+		page_text0 = b64decode(gcs_file.read())
+		gcs_file.close()
 		
 		#format text
 		#page_text_formatted0 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text0)
@@ -305,7 +323,7 @@ class PyglPage(Handler):
 		
 		########################
 		
-		self.render('page', page_text0=page.text0, comments_active = page.comments_active, page_views=page_views.views, page_created = page.created.date(), page_last_edit = page.last_edit.date(), pygl_uri=page.pygl_uri)
+		self.render('page', page_text0=page_text0, comments_active = page.comments_active, page_views=page_views.views, page_created = page.created.date(), page_last_edit = page.last_edit.date(), pygl_uri=page.pygl_uri)
 		
 		return
 		
@@ -337,13 +355,21 @@ class PyglPageEdit(Handler):
 		
 		save_page = self.request.get('save_page')
 		
-		page_title = self.request.get('page_title')
-		page_text0 = self.request.get('page_text0')
-		page_text1 = self.request.get('page_text1')
-		page_text2 = self.request.get('page_text2')
-		page_image_id0 = self.request.get('image_id0')
-		page_image_id1 = self.request.get('image_id1')
-		page_image_id2 = self.request.get('image_id2')
+		#page_title = self.request.get('page_title')
+		#page_text0 = self.request.get('page_text0')
+		#page_text1 = self.request.get('page_text1')
+		#page_text2 = self.request.get('page_text2')
+		#page_image_id0 = self.request.get('image_id0')
+		#page_image_id1 = self.request.get('image_id1')
+		#page_image_id2 = self.request.get('image_id2')
+		
+		# load from bucket
+		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'r')
+		page_text0 = b64decode(gcs_file.read())
+		gcs_file.close()
+		
 		page_email = self.request.get('page_email')
 		if self.request.get('comments_active'):
 			comments_checked = "checked"
@@ -387,13 +413,13 @@ class PyglPageEdit(Handler):
 				result = json.load(response)
 				if result['success']:
 				
-					page.title = page_title
-					page.text0 = page_text0
-					page.text1 = page_text1
-					page.text2 = page_text2
-					page.image_id0 = page_image_id0
-					page.image_id1 = page_image_id1
-					page.image_id2 = page_image_id2
+					#page.title = page_title
+					#page.text0 = page_text0
+					#page.text1 = page_text1
+					#page.text2 = page_text2
+					#page.image_id0 = page_image_id0
+					#page.image_id1 = page_image_id1
+					#page.image_id2 = page_image_id2
 					page.email = page_email
 					if self.request.get('comments_active'):
 						page.comments_active = True
@@ -402,6 +428,14 @@ class PyglPageEdit(Handler):
 					page.last_edit = datetime.datetime.utcnow()
 					
 					page.put()
+					
+					# write file in bucket
+					bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+					# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+					gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'w', content_type='text/html')
+					gcs_file.write(b64encode(page_text0))
+					gcs_file.close()
+					
 					redirect_string = 'http://' + page.pygl_uri + '.py.gl'
 					# redirect string must be str, no unicode
 					self.redirect(str(redirect_string))

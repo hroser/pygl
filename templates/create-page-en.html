@@ -100,7 +100,7 @@ margin-bottom: 15px
 	<meta name="keywords" content="pygl, create free website, free microsite, create microsite, create single-page website, get free advertisement website, create free business website">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style type="text/css"></style>
-	<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/0C00014A-5DCC-2E4D-8465-76AE9EF1EB5C/main.js" charset="UTF-8"></script><script src='https://www.google.com/recaptcha/api.js'></script>
+	<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/0C00014A-5DCC-2E4D-8465-76AE9EF1EB5C/main.js" charset="UTF-8"></script><script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/0C00014A-5DCC-2E4D-8465-76AE9EF1EB5C/main.js" charset="UTF-8"></script><script src='https://www.google.com/recaptcha/api.js'></script>
 	<script>
        function onSubmit(token) {
          //gtag_report_conversion();
@@ -174,33 +174,30 @@ margin-bottom: 15px
             var ctx = canvas.getContext("2d");
             ctx.drawImage(image, 0, 0, width, height);
         
-            dataurl = canvas.toDataURL("image/png");
+            dataurl = canvas.toDataURL("image/jpeg", 0.6);
             //console.log(dataurl); 
             //reader.readAsDataURL(canvas.toDataURL("image/png"));
           
+            canvas.toBlob(function(blob){
+            blob.name = file.name;               
+            
+              // Note: Now we need to register the blob in TinyMCEs image blob
+            // registry. In the next release this part hopefully won't be
+            // necessary, as we are looking to handle it internally.
+            var id = 'blobid' + (new Date()).getTime();
+            var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
+            var base64 = dataurl.split(',')[1];
+            var blobInfo = blobCache.create(id, blob, base64);
+
+            blobCache.add(blobInfo);
+
+
+            // call the callback and populate the Title field with the file name
+            cb(blobInfo.blobUri(), { title: blob.name });
+              
+            }, 'image/jpeg', 0.6);
           
-          // Note: Now we need to register the blob in TinyMCEs image blob
-	        // registry. In the next release this part hopefully won't be
-	        // necessary, as we are looking to handle it internally.
-	        var id = 'blobid' + (new Date()).getTime();
-	        var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-	        var base64 = dataurl.split(',')[1];
-
-          var byteCharacters = atob(base64);
-          var byteNumbers = new Array(byteCharacters.length);
-          for (var i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          var byteArray = new Uint8Array(byteNumbers);
-          var filenew = new Blob([byteArray], {type: 'image/png'});
-          filenew.name = file.name;
-	        var blobInfo = blobCache.create(id, filenew, base64);
-
-          blobCache.add(blobInfo);
-
-	
-	        // call the callback and populate the Title field with the file name
-	        cb(blobInfo.blobUri(), { title: filenew.name });
+          
         };
         
         imgreader.readAsDataURL(file);

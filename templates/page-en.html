@@ -19,6 +19,15 @@ font: 14px sans-serif;
 width: 94%;
 margin-left: 3%;
 }
+  
+.maincontent {
+margin: 10px;
+}
+  
+.disquscomments {
+width: 94%;
+margin-left: 3%;
+}
 
 .error {
 color: red;
@@ -91,7 +100,7 @@ margin-left: 3%;
 	
 	{% if (page_text0 and page_text0 != "") %}
 	<br>
-	<div>
+	<div class="maincontent">
 	{{page_text0|safe}}
 	</div>
 	{% endif %}
@@ -129,7 +138,7 @@ margin-left: 3%;
 	{% if comments_active == True %}
 	
 	
-	<div id="disqus_thread"></div>
+	<div id="disqus_thread" class="disquscomments"></div>
 	<script>
 	
 	/**

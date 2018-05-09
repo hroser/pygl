@@ -130,7 +130,7 @@ class MainPage(Handler):
 		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 		try:
 			gcs_file = gcs.open('/' + bucket_name + '/pages/' + 'pygl', 'r')
-			landing_text = b64decode(gcs_file.read())
+			landing_text = b64decode(gcs_file.read().decode('utf-8'))
 			gcs_file.close()
 		except:
 			pass
@@ -248,7 +248,7 @@ class MainPage(Handler):
 				bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 				# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 				gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(page_id), 'w', content_type='text/html')
-				gcs_file.write(b64encode(page_text0))
+				gcs_file.write(b64encode(page_text0.encode('utf-8')))
 				gcs_file.close()
 				redirect_string = 'http://' + page_uri_val + '.py.gl'
 				# redirect string must be str, no unicode
@@ -290,7 +290,7 @@ class PyglPage(Handler):
 		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(requested_id), 'r')
-		page_text0 = b64decode(gcs_file.read())
+		page_text0 = b64decode(gcs_file.read().decode('utf-8'))
 		gcs_file.close()
 		
 		#format text
@@ -427,7 +427,7 @@ class PyglPageEdit(Handler):
 					bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 					# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 					gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'w', content_type='text/html')
-					gcs_file.write(b64encode(page_text0))
+					gcs_file.write(b64encode(page_text0.encode('utf-8')))
 					gcs_file.close()
 					
 					redirect_string = 'http://' + page.pygl_uri + '.py.gl'
@@ -449,7 +449,7 @@ class PyglPageEdit(Handler):
 			bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 			# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 			gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'r')
-			page_text0 = b64decode(gcs_file.read())
+			page_text0 = b64decode(gcs_file.read().decode('utf-8'))
 			gcs_file.close()
 				
 			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)

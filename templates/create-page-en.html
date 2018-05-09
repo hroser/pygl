@@ -139,23 +139,71 @@ margin-bottom: 15px
 	
 	    input.onchange = function() {
 	      var file = this.files[0];
-	      
-	      var reader = new FileReader();
-	      reader.onload = function () {
+        var dataurl;
+        
+        var imgreader = new FileReader();
+	      imgreader.onload = function () {
 	      	
-	        // Note: Now we need to register the blob in TinyMCEs image blob
+	        image.src = event.target.result;;
+	      };
+        
+        
+        // Create an image
+        var image = new Image();
+        image.onload = function()
+        {
+            var MAX_WIDTH = 640;
+            var MAX_HEIGHT = 640;
+            var width = image.width;
+            var height = image.height;
+
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+            var canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(image, 0, 0, width, height);
+        
+            dataurl = canvas.toDataURL("image/png");
+            //console.log(dataurl); 
+            //reader.readAsDataURL(canvas.toDataURL("image/png"));
+          
+          
+          // Note: Now we need to register the blob in TinyMCEs image blob
 	        // registry. In the next release this part hopefully won't be
 	        // necessary, as we are looking to handle it internally.
 	        var id = 'blobid' + (new Date()).getTime();
 	        var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-	        var base64 = reader.result.split(',')[1];
-	        var blobInfo = blobCache.create(id, file, base64);
-	        blobCache.add(blobInfo);
+	        var base64 = dataurl.split(',')[1];
+
+          var byteCharacters = atob(base64);
+          var byteNumbers = new Array(byteCharacters.length);
+          for (var i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          var byteArray = new Uint8Array(byteNumbers);
+          var filenew = new Blob([byteArray], {type: 'image/png'});
+          filenew.name = file.name;
+	        var blobInfo = blobCache.create(id, filenew, base64);
+
+          blobCache.add(blobInfo);
+
 	
 	        // call the callback and populate the Title field with the file name
-	        cb(blobInfo.blobUri(), { title: file.name });
-	      };
-	      reader.readAsDataURL(file);
+	        cb(blobInfo.blobUri(), { title: filenew.name });
+        };
+        
+        imgreader.readAsDataURL(file);
 	    };
 	    
 	    input.click();

@@ -44,7 +44,7 @@ table, tr, td {
 	<meta name="description" content="">
 	<meta name="viewport" content="width=720">
 	<style type="text/css"></style>
-	<script src='https://www.google.com/recaptcha/api.js'></script>
+	<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/0C00014A-5DCC-2E4D-8465-76AE9EF1EB5C/main.js" charset="UTF-8"></script><script src='https://www.google.com/recaptcha/api.js'></script>
 	<script>
        function onSubmit(token) {
          document.getElementById("edit-form").submit();
@@ -58,10 +58,9 @@ table, tr, td {
     selector: '#maintextarea',
     height: 500,
     theme: "modern",
-    plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern autoresize',
+    plugins: 'preview paste searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount imagetools contextmenu colorpicker textpattern autoresize',
   	toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-	image_dimensions: false,
-	verify_html: false,
+	  image_dimensions: false,
 
   	// enable automatic uploads of images represented by blob or data URIs
   	automatic_uploads: true,

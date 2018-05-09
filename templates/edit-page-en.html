@@ -44,7 +44,9 @@ table, tr, td {
 	<meta name="description" content="">
 	<meta name="viewport" content="width=720">
 	<style type="text/css"></style>
+  <!--
 	<script src='https://www.google.com/recaptcha/api.js'></script>
+  -->
 	<script>
        function onSubmit(token) {
          document.getElementById("edit-form").submit();
@@ -400,12 +402,15 @@ function jumptoanchor(anchor){
 				Save changes:
 				</td>
 				<td>
+        <!--
 				<button
 				class="g-recaptcha" style="font: 15px sans-serif;"
 				data-sitekey="6Le1hicUAAAAAKPxxf4c3xJn61w5Za78csRVWjlS"
 				data-callback="onSubmit">
 				Save
 				</button>
+        -->
+        <button onclick="onSubmit()" style="font: 15px sans-serif;width:100px;">Save</button>
 				</td>
 			</tr>
 			<tr>

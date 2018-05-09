@@ -232,6 +232,7 @@ class MainPage(Handler):
 
 
 		''' Begin reCAPTCHA validation '''
+		'''
 		recaptcha_response = self.request.get('g-recaptcha-response')
 		recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
 		values = {'secret': "6Le1hicUAAAAAAX3u5ccpJ08kFecBLdZQnbi77iz", 'response': recaptcha_response}
@@ -266,8 +267,20 @@ class MainPage(Handler):
 				page_uri = page_uri, comments_checked=comments_checked, page_email = page_email, err_uri_not_available=err_uri_not_available, 
 				err_title=err_title, err_password_retype=err_password_retype, err_uri_invalid=err_uri_invalid, 
 				err_passwort_format=err_passwort_format, err_captcha=err_captcha)
-		''' End reCAPTCHA validation '''
+		'''
+ 		''' End reCAPTCHA validation '''
 		
+    # write datastore
+		pygl_page.put()
+		# write file in bucket
+		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(page_id), 'w', content_type='text/html')
+		gcs_file.write(b64encode(page_text0.encode('utf-8')))
+		gcs_file.close()
+		redirect_string = 'http://' + page_uri_val + '.py.gl'
+		# redirect string must be str, no unicode
+		self.redirect(str(redirect_string))
 		
 		
 class PyglPage(Handler):
@@ -396,6 +409,7 @@ class PyglPageEdit(Handler):
 		if (save_page == "True"):
 		
 			''' Begin reCAPTCHA validation '''
+			'''
 			recaptcha_response = self.request.get('g-recaptcha-response')
 			recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
 			values = {'secret': "6Le1hicUAAAAAAX3u5ccpJ08kFecBLdZQnbi77iz", 'response': recaptcha_response}
@@ -437,7 +451,28 @@ class PyglPageEdit(Handler):
 					self.response.out.write("check failed")
 			else:
 				self.response.out.write("please check the recaptcha")
+			'''
 			''' End reCAPTCHA validation '''
+
+			page.email = page_email
+			if self.request.get('comments_active'):
+				page.comments_active = True
+			else:
+				page.comments_active = False
+			page.last_edit = datetime.datetime.utcnow()
+					
+			page.put()
+					
+			# write file in bucket
+			bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+			# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+			gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'w', content_type='text/html')
+			gcs_file.write(b64encode(page_text0.encode('utf-8')))
+			gcs_file.close()
+					
+			redirect_string = 'http://' + page.pygl_uri + '.py.gl'
+			# redirect string must be str, no unicode
+			self.redirect(str(redirect_string))
 		
 		else:
 			if page.comments_active:

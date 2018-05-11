@@ -36,6 +36,12 @@ def validate_uri(uri_inputstring):
 		return uri_inputstring
 	else:
 		return None	
+  
+def validate_email(email_inputstring):
+	if re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email_inputstring):
+		return email_inputstring
+	else:
+		return None	
 		
 #function make_salt returns a string of 5 random characters
 

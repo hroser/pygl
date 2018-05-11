@@ -19,6 +19,7 @@ import datetime
 
 # for routing subdomains
 from webapp2_extras import routes
+from google.appengine.api import mail
 
 # for logging
 import logging
@@ -278,7 +279,26 @@ class MainPage(Handler):
 		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(page_id), 'w', content_type='text/html')
 		gcs_file.write(b64encode(page_text0.encode('utf-8')))
 		gcs_file.close()
-		redirect_string = 'http://' + page_uri_val + '.py.gl'
+		redirect_string = 'http://' + page_uri_val + '.py.gl/r/landing'
+
+		if (page_email != "" and pt.validate_email(page_email)):
+			# send mail
+			mail.send_mail(sender="py.gl Website <noreply@pygl-page.appspotmail.com>", to=page_email, subject="Thank you for creating " + page_uri_val + ".py.gl", body="""
+Thank you for creating a website with py.gl!
+
+
+Your free website is now available under: """ + page_uri_val + """.py.gl
+
+To edit your website visit """ +  page_uri_val + """.py.gl/edit and log in with your password.
+
+You also find your website editor by selecting 'Edit page' at the bottom of your page.
+
+
+Enjoy your free website!
+
+The py.gl Team
+			""")
+		
 		# redirect string must be str, no unicode
 		self.redirect(str(redirect_string))
 		
@@ -557,6 +577,14 @@ class PyglReportAbuse(Handler):
 			''' End reCAPTCHA validation '''
 	
 	
+class PyglPageLanding(Handler):
+	def get(self, requested_uri = ""):
+			
+		# display landing page
+		self.render('landing', page_uri=requested_uri)
+		
+  
+  
 class PyglPageDelete(Handler):
 	def get(self, requested_uri):
 	
@@ -716,13 +744,17 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/', handler=MainPage)
     ]),
     routes.DomainRoute('<requested_uri>.py.gl', [
+    webapp2.Route(r'/edit', handler=PyglPageEdit),
     webapp2.Route(r'/r/edit', handler=PyglPageEdit),
+    webapp2.Route(r'/r/landing', handler=PyglPageLanding),
     webapp2.Route(r'/r/report-page', handler=PyglReportAbuse),
     webapp2.Route(r'/r/delete', handler=PyglPageDelete),
     webapp2.Route(r'/', handler=PyglPage)
     ]),
     routes.DomainRoute('www.<requested_uri>.py.gl', [
+    webapp2.Route(r'/edit', handler=PyglPageEdit),
     webapp2.Route(r'/r/edit', handler=PyglPageEdit),
+    webapp2.Route(r'/r/landing', handler=PyglPageLanding),
     webapp2.Route(r'/r/report-page', handler=PyglReportAbuse),
     webapp2.Route(r'/r/delete', handler=PyglPageDelete),
     webapp2.Route(r'/', handler=PyglPage)

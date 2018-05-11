@@ -335,7 +335,7 @@ function jumptoanchor(anchor){
 	</script>
 </head>
 
-<body onload=jumptoanchor("{% if (err_uri_invalid == True) or (err_password_retype == True) or (err_uri_not_available == True) or (err_passwort_format == True) or (err_captcha == True)%}pub{% endif %}")>
+<body onload=jumptoanchor("{% if (err_wrong_password == True) or (err_password_locked == True) or (err_uri_not_available == True) or (err_passwort_format == True) or (err_captcha == True)%}pub{% endif %}")>
 	<form id="edit-form" method="POST" enctype="multipart/form-data">
 		
 		

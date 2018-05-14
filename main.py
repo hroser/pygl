@@ -366,8 +366,9 @@ class PyglPageEdit(Handler):
 	def get(self, requested_uri):
 		err_wrong_password = False;
 		err_password_locked = False;
+		status_saved = False;
 	
-		self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
+		self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved=status_saved)
 	
 	def post(self, requested_uri):
 	
@@ -406,8 +407,9 @@ class PyglPageEdit(Handler):
 		
 		if (page.login_fails_consec >= 3) and ((datetime.datetime.utcnow() - page.login_fail_last) < datetime.timedelta(minutes=10)):
 			err_password_locked = True;
+			status_saved = False;
 			if (save_page == "True"):
-				self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
+				self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved=status_saved)
 			else:
 				self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 			return
@@ -417,8 +419,9 @@ class PyglPageEdit(Handler):
 			page.put()
 		else:
 			err_wrong_password = True;
+			status_saved = False;
 			if (save_page == "True"):
-				self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
+				self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page_email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved=status_saved)
 			else:
 				self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 			page.login_fails_consec = page.login_fails_consec + 1
@@ -474,7 +477,7 @@ class PyglPageEdit(Handler):
 				self.response.out.write("please check the recaptcha")
 			'''
 			''' End reCAPTCHA validation '''
-
+			
 			page.email = page_email
 			if self.request.get('comments_active'):
 				page.comments_active = True
@@ -493,7 +496,11 @@ class PyglPageEdit(Handler):
 					
 			redirect_string = 'http://' + page.pygl_uri + '.py.gl'
 			# redirect string must be str, no unicode
-			self.redirect(str(redirect_string))
+			#self.redirect(str(redirect_string))
+			err_wrong_password = False;
+			err_password_locked = False;
+			status_saved = True;
+			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved = status_saved)
 		
 		else:
 			if page.comments_active:
@@ -508,7 +515,8 @@ class PyglPageEdit(Handler):
 			page_text0 = b64decode(gcs_file.read()).decode('utf-8')
 			gcs_file.close()
 				
-			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
+			status_saved = False;
+			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved = status_saved)
 		
 class PyglReportAbuse(Handler):
 	def get(self, requested_uri = ""):

@@ -14,6 +14,11 @@ margin: 0 auto;
 color: red;
 font: 14px sans-serif;
 }
+  
+.changessaved {
+color: green;
+font: 14px sans-serif;
+}
 
 .center {
 margin: 0 auto;
@@ -339,19 +344,42 @@ function useSimpleForm(){
 function jumptoanchor(anchor){
 	if (anchor !== '' && anchor !== undefined)
 	{
-		location.href="#" + anchor;
+		//location.href="#" + anchor;
 	}
 	}
 	
 	</script>
 </head>
 
-<body onload=jumptoanchor("{% if (err_wrong_password == True) or (err_password_locked == True) or (err_uri_not_available == True) or (err_passwort_format == True) or (err_captcha == True)%}pub{% endif %}")>
+<body onload=jumptoanchor("{% if (status_saved == True) or (err_wrong_password == True) or (err_password_locked == True) or (err_uri_not_available == True) or (err_passwort_format == True) or (err_captcha == True)%}pub{% endif %}")>
 	<form id="edit-form" method="POST" enctype="multipart/form-data">
 		
 		
-		<br>
-		
+		<br><br>
+    <center>
+    <h3>
+		In this editor you can create your free website <br><br><a href="http://{{page_uri}}.py.gl" style="color: black;font-weight: bold;">{{page_uri}}.py.gl</a>:
+    </h3>
+		<br><br>
+      {% if status_saved == True %}
+        <div class = "changessaved">
+				Successfully saved changes
+        </div>
+				{% endif %}
+          
+				<div class = "error">
+				{% if err_captcha == True %}
+				sorry, recaptcha failed
+				{% endif %}
+				{% if err_wrong_password == True %}
+				>Sorry, you entered a wrong password.
+				{% endif %}
+				{% if err_password_locked == True %}
+				Sorry, a wrong password was entered three times, please wait 10 minutes.
+				{% endif %}
+				</div>
+      
+    </center>
 		<div>
 			<label>
 				<p>
@@ -361,9 +389,13 @@ function jumptoanchor(anchor){
 		</div>
 		<a name="pub"></a>
 
+    <br><br>
+    
 		
 		<div class="centertable">
-			<table>
+			
+      <b>Website settings</b><br><br>
+      <table>
 			<col width="250">
 			<col width="250">
 			<tr>
@@ -386,9 +418,27 @@ function jumptoanchor(anchor){
 				</label>
 				</td>
 			<tr>
+        <tr>
+				<td>
+				Delete website:
+				</td>
+				<td>
+				<label>
+					<a href="/r/delete" style="color: black;font-weight: normal;">Delete {{page_uri}}.py.gl</a>
+				</label>
+				</td>
+			<tr>
+      </table>
+      
+      
+      <br><br>
+      <b>Save changes</b><br><br>
+      <table>
+      <col width="250">
+			<col width="250">
 			<tr>
 				<td>
-				Enter password:
+				Enter your password and save:
 				</td>
 				<td>
 				<label>
@@ -402,7 +452,7 @@ function jumptoanchor(anchor){
 			</tr>
 			<tr>
 				<td>
-				Save changes:
+				
 				</td>
 				<td>
         <!--
@@ -422,24 +472,14 @@ function jumptoanchor(anchor){
 				</td>
 				<td>
 				<br>
-				<div class = "error">
-				{% if err_captcha == True %}
-				sorry, recaptcha failed
-				{% endif %}
-				{% if err_wrong_password == True %}
-					Sorry, you entered a wrong password.
-				{% endif %}
-				{% if err_password_locked == True %}
-					Sorry, a wrong password was entered three times, please wait 10 minutes.
-				{% endif %}
-				</div>
+        
 				</td>
 			</tr>
 			</table>
 		</div>
 		<div class="center">
 			<br><br>
-			<a href="/r/delete" style="color: black;font-weight: normal;">Delete page</a>
+			
 		</div>
 		
 		<br>

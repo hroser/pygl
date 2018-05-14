@@ -131,7 +131,7 @@ class MainPage(Handler):
 		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 		try:
 			gcs_file = gcs.open('/' + bucket_name + '/pages/' + 'pygl', 'r')
-			landing_text = b64decode(gcs_file.read().decode('utf-8'))
+			landing_text = b64decode(gcs_file.read()).decode('utf-8')
 			gcs_file.close()
 		except:
 			pass
@@ -287,14 +287,14 @@ class MainPage(Handler):
 Thank you for creating a website with py.gl!
 
 
-Your free website is now available under: """ + page_uri_val + """.py.gl
+Your free website is now available at: """ + page_uri_val + """.py.gl
 
 To edit your website visit """ +  page_uri_val + """.py.gl/edit and log in with your password.
 
 You also find your website editor by selecting 'Edit page' at the bottom of your page.
 
 
-Enjoy your free website!
+Enjoy and share your free website!
 
 The py.gl Team
 			""")
@@ -323,8 +323,9 @@ class PyglPage(Handler):
 		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(requested_id), 'r')
-		page_text0 = b64decode(gcs_file.read().decode('utf-8'))
+		page_text0 = b64decode(gcs_file.read()).decode('utf-8')
 		gcs_file.close()
+
 		
 		#format text
 		#page_text_formatted0 = re.sub(r"[a-zA-Z0-9_.+-/:?#@%&$=]+\.[a-zA-Z0-9_.+-/:?#@%&$=]+", pt.format_text_links, page.text0)
@@ -504,7 +505,7 @@ class PyglPageEdit(Handler):
 			bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 			# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
 			gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(edit_id), 'r')
-			page_text0 = b64decode(gcs_file.read().decode('utf-8'))
+			page_text0 = b64decode(gcs_file.read()).decode('utf-8')
 			gcs_file.close()
 				
 			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)

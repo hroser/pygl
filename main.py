@@ -94,13 +94,16 @@ class Abusereport(ndb.Model):
 	
 class Handler(webapp2.RequestHandler):
 	def write(self, *a, **kw):
+		#cookie = kw.get('cookie', None)
+		#if cookie:
+		#	self.response.set_cookie('some_key', 'value', max_age=86400, path='/', domain='py.gl', secure=False)
 		self.response.out.write(*a, **kw)
 
 	def render_str(self, template, **params):
 		t = jinja_env.get_template(template)
 		return t.render(params)
 
-	def render(self, template, **kw):
+	def render(self, template, cookie = None, **kw):
 		"""
 		problem mit none:
 		'NoneType' object has no attribute 'split'
@@ -120,7 +123,14 @@ class Handler(webapp2.RequestHandler):
 		# undo escaping of </a>, "> and < a href=\"
 		#output = output.replace("&lt;/a&gt;","</a>").replace("&#34;&gt;","\">").replace("&lt;a href=&#34;","<a href=\"")
 		output = self.render_str(template, **kw)
-		self.write(output)
+		#self.write(output, cookie = '1')
+		#self.write(output)
+		if cookie:
+			if cookie[0] == 'set':
+				self.response.set_cookie(cookie[1], cookie[2], max_age=86400, path='/', domain='py.gl', secure=False)
+			if cookie[0] == 'del':
+				self.response.delete_cookie(cookie[1], path='/', domain='py.gl')
+		self.response.out.write(output)
 
 class MainPage(Handler):
 	def get(self):
@@ -300,7 +310,9 @@ The py.gl Team
 			""")
 		
 		# redirect string must be str, no unicode
-		self.redirect(str(redirect_string))
+		#self.redirect(str(redirect_string))
+		# display landing page
+		self.render('landing', ['set', 'pyglpage', pt.make_cookie_hash(page_id)], page_uri=page_uri_val)
 		
 		
 class PyglPage(Handler):
@@ -356,8 +368,11 @@ class PyglPage(Handler):
 		page_views.put()
 		
 		########################
+		cookie = None;
+		if self.request.get('logout') == 'true':
+			cookie = ['del', 'pyglpage', '']
 		
-		self.render('page', page_text0=page_text0, comments_active = page.comments_active, page_views=page_views.views, page_created = page.created.date(), page_last_edit = page.last_edit.date(), pygl_uri=page.pygl_uri)
+		self.render('page', cookie, page_text0=page_text0, comments_active = page.comments_active, page_views=page_views.views, page_created = page.created.date(), page_last_edit = page.last_edit.date(), pygl_uri=page.pygl_uri)
 		
 		return
 		
@@ -367,7 +382,30 @@ class PyglPageEdit(Handler):
 		err_wrong_password = False;
 		err_password_locked = False;
 		status_saved = False;
-	
+		
+		requested_id = requested_uri.replace("-","").lower()
+		
+		cookiehash = self.request.cookies.get('pyglpage')
+		if cookiehash and pt.check_cookie_hash(requested_id, cookiehash):
+			key = ndb.Key(Pyglpage, requested_id)
+			page = key.get()
+			err_wrong_password = False;
+			err_password_locked = False;
+			status_saved = False;
+			if page.comments_active:
+				comments_checked = "checked"
+			else:
+				comments_checked = ""
+				
+			# load from bucket
+			bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+			# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+			gcs_file = gcs.open('/' + bucket_name + '/pages/' + str(requested_id), 'r')
+			page_text0 = b64decode(gcs_file.read()).decode('utf-8')
+			gcs_file.close()
+			self.render('edit-page', ['set', 'pyglpage', pt.make_cookie_hash(requested_id)], page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved = status_saved)
+			return
+		
 		self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved=status_saved)
 	
 	def post(self, requested_uri):
@@ -405,7 +443,7 @@ class PyglPageEdit(Handler):
 		else:
 			comments_checked = ""
 		
-		if (page.login_fails_consec >= 3) and ((datetime.datetime.utcnow() - page.login_fail_last) < datetime.timedelta(minutes=10)):
+		if (page.login_fails_consec >= 5) and ((datetime.datetime.utcnow() - page.login_fail_last) < datetime.timedelta(minutes=10)):
 			err_password_locked = True;
 			status_saved = False;
 			if (save_page == "True"):
@@ -414,7 +452,9 @@ class PyglPageEdit(Handler):
 				self.render('checkpassword', page_uri=requested_uri, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked)
 			return
 		
-		if pt.valid_pw(edit_id, password, page.password_hash):
+		cookiehash = self.request.cookies.get('pyglpage')
+		
+		if (cookiehash and pt.check_cookie_hash(edit_id, cookiehash)) or pt.valid_pw(edit_id, password, page.password_hash):
 			page.login_fails_consec = 0		
 			page.put()
 		else:
@@ -500,7 +540,7 @@ class PyglPageEdit(Handler):
 			err_wrong_password = False;
 			err_password_locked = False;
 			status_saved = True;
-			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved = status_saved)
+			self.render('edit-page', ['set', 'pyglpage', pt.make_cookie_hash(edit_id)], page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved = status_saved)
 		
 		else:
 			if page.comments_active:
@@ -516,7 +556,7 @@ class PyglPageEdit(Handler):
 			gcs_file.close()
 				
 			status_saved = False;
-			self.render('edit-page', page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved = status_saved)
+			self.render('edit-page', ['set', 'pyglpage', pt.make_cookie_hash(edit_id)], page_text0=page_text0, page_uri=page.pygl_uri, comments_checked=comments_checked, page_email = page.email, err_wrong_password=err_wrong_password, err_password_locked=err_password_locked, status_saved = status_saved)
 		
 class PyglReportAbuse(Handler):
 	def get(self, requested_uri = ""):
@@ -633,7 +673,7 @@ class PyglPageDelete(Handler):
 			self.response.out.write("sorry, pygl-page does not exist")
 			return
 
-		if (page.login_fails_consec >= 3) and ((datetime.datetime.utcnow() - page.login_fail_last) < datetime.timedelta(minutes=10)):
+		if (page.login_fails_consec >= 5) and ((datetime.datetime.utcnow() - page.login_fail_last) < datetime.timedelta(minutes=10)):
 			err_password_locked = True;
 			self.render('delete-page', page_uri=page.pygl_uri, err_password_locked=err_password_locked, err_wrong_password=err_wrong_password)
 			return

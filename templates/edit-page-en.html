@@ -372,10 +372,10 @@ function jumptoanchor(anchor){
 				sorry, recaptcha failed
 				{% endif %}
 				{% if err_wrong_password == True %}
-				>Sorry, you entered a wrong password.
+				Sorry, you are not logged in, please enter your password.
 				{% endif %}
 				{% if err_password_locked == True %}
-				Sorry, a wrong password was entered three times, please wait 10 minutes.
+				Sorry, a wrong password was entered five times, please wait 10 minutes.
 				{% endif %}
 				</div>
       
@@ -394,10 +394,18 @@ function jumptoanchor(anchor){
 		
 		<div class="centertable">
 			
-      <b>Website settings</b><br><br>
+      
       <table>
 			<col width="250">
 			<col width="250">
+      <tr>
+				<td>
+				<b>Website settings</b><br><br>
+				</td>
+				<td>
+				
+				</td>
+			</tr>
 			<tr>
 				<td>
 				Show comments:<br>
@@ -432,27 +440,26 @@ function jumptoanchor(anchor){
       
       
       <br><br>
-      <b>Save changes</b><br><br>
+      
       <table>
       <col width="250">
 			<col width="250">
-			<tr>
+      
+			<!--
+        <tr>
 				<td>
 				Enter your password and save:
 				</td>
 				<td>
-				<label>
+					{% if err_wrong_password == True %}
 					<input type="password" style="font: 16px sans-serif; width: 260px;" name="password" placeholder="">
-					{% if err_password_retype == True %}
-					wrong password
 					{% endif %}
-					<input type="hidden" name="save_page" value="True">
-				</label>
 				</td>
 			</tr>
+      -->
 			<tr>
-				<td>
-				
+				<td valign="top">
+				<b>Save changes</b>
 				</td>
 				<td>
         <!--
@@ -463,6 +470,10 @@ function jumptoanchor(anchor){
 				Save
 				</button>
         -->
+        <input type="hidden" name="save_page" value="True">
+        {% if err_wrong_password == True or err_password_locked == True %}
+					Enter password: <br><input type="password" style="font: 16px sans-serif; width: 260px;" name="password" placeholder=""><br><br>
+			  {% endif %}
         <button onclick="onSubmit()" style="font: 15px sans-serif;width:100px;">Save</button>
 				</td>
 			</tr>
@@ -475,8 +486,20 @@ function jumptoanchor(anchor){
         
 				</td>
 			</tr>
+      <tr>
+		  <td>
+			<b>Logout from website</b><br>
+			</td>
+			<td>
+			<a href="http://{{page_uri}}.py.gl/?logout=true" style="color: black;">Logout</a><br>
+			</td>
+			</tr>
 			</table>
 		</div>
+    <br><br><br>
+    <center>
+    
+    </center>
 		<div class="center">
 			<br><br>
 			

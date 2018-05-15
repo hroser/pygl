@@ -58,6 +58,19 @@ def make_pw_hash(name, pw, salt = None):
 		salt = make_salt()
 	h = hashlib.sha256(name + pw + salt).hexdigest()
 	return '%s,%s' % (h, salt)
+
+def make_cookie_hash(name):
+	pw = 'ueSn!du98!hdWkO6'
+	h = hashlib.sha256(name + pw).hexdigest()
+	return h
+
+def check_cookie_hash(name, hash):
+	pw = 'ueSn!du98!hdWkO6'
+	h = hashlib.sha256(name + pw).hexdigest()
+	result = False;
+	if h == hash:
+		result = True;
+	return result
 	
 # function valid_pw() returns True if a user's password 
 # matches its hash

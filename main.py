@@ -631,6 +631,89 @@ class PyglPageLanding(Handler):
 			
 		# display landing page
 		self.render('landing', page_uri=requested_uri)
+        
+        
+class PyglChangePassword(Handler):
+	def get(self, requested_uri):
+	
+		err_wrong_password = False;
+		err_password_locked = False;
+        err_password_retype = False;
+        err_passwort_format = False;
+	
+		if (requested_uri == ""):
+			self.response.out.write("sorry, pygl-page does not exist")
+			return
+		
+		# load page
+		page_id = requested_uri.replace("-","").lower()
+		key = ndb.Key(Pyglpage, page_id)
+		page = key.get()
+			
+		if not page:
+			self.response.out.write("sorry, pygl-page does not exist")
+			return
+			
+		# display change password page
+		self.render('changepassword', page_uri=page.pygl_uri, err_password_locked=err_password_locked, err_wrong_password=err_wrong_password, err_password_retype=err_password_retype, err_passwort_format=err_passwort_format)
+		
+	def post(self, requested_uri):
+	
+		err_wrong_password = False;
+		err_password_locked = False;
+        err_password_retype = False;
+        err_passwort_format = False;
+        msg_password_changed = False;
+	
+		password = self.request.get('password')
+        password_new = pt.validate_password(self.request.get('password_new'))
+        password_new_retype = pt.validate_password(self.request.get('password_new_retype'))
+		
+		# load page
+		page_id = requested_uri.replace("-","").lower()
+		key = ndb.Key(Pyglpage, page_id)
+		page = key.get()
+		
+		if not page:
+			self.response.out.write("sorry, pygl-page does not exist")
+			return
+
+		if (page.login_fails_consec >= 5) and ((datetime.datetime.utcnow() - page.login_fail_last) < datetime.timedelta(minutes=10)):
+			err_password_locked = True;
+			self.render('changepassword', page_uri=page.pygl_uri, err_password_locked=err_password_locked, err_wrong_password=err_wrong_password, err_password_retype=err_password_retype, err_passwort_format=err_passwort_format, msg_password_changed=msg_password_changed)
+			return
+		
+		if pt.valid_pw(page_id, password, page.password_hash):
+            # reset pw consec fail count
+			page.login_fails_consec = 0	
+            
+            # check new password
+            if (not password_new):
+                err_passwort_format = True;
+                self.render('changepassword', page_uri=page.pygl_uri, err_password_locked=err_password_locked, err_wrong_password=err_wrong_password, err_password_retype=err_password_retype, err_passwort_format=err_passwort_format, msg_password_changed=msg_password_changed)
+                page.put()
+                return
+                
+            # check new password
+            if password_new != password_new_retype:
+                err_password_retype = True;
+                self.render('changepassword', page_uri=page.pygl_uri, err_password_locked=err_password_locked, err_wrong_password=err_wrong_password, err_password_retype=err_password_retype, err_passwort_format=err_passwort_format, msg_password_changed=msg_password_changed)
+                page.put()
+                return
+                
+            page.password_hash = pt.make_pw_hash(page_id, password_new)
+            page.put()
+		else:
+			err_wrong_password = True;
+			self.render('changepassword', page_uri=page.pygl_uri, err_password_locked=err_password_locked, err_wrong_password=err_wrong_password, err_password_retype=err_password_retype, err_passwort_format=err_passwort_format, msg_password_changed=msg_password_changed)
+			page.login_fails_consec = page.login_fails_consec + 1
+			page.login_fail_last = datetime.datetime.utcnow()			# remember last failed login datetime
+            page.put()
+            return
+		
+        msg_password_changed = True;
+		self.render('changepassword', page_uri=page.pygl_uri, err_password_locked=err_password_locked, err_wrong_password=err_wrong_password, err_password_retype=err_password_retype, err_passwort_format=err_passwort_format, msg_password_changed=msg_password_changed)
+
 		
   
   
@@ -795,6 +878,7 @@ app = webapp2.WSGIApplication([
     routes.DomainRoute('<requested_uri>.py.gl', [
     webapp2.Route(r'/edit', handler=PyglPageEdit),
     webapp2.Route(r'/r/edit', handler=PyglPageEdit),
+    webapp2.Route(r'/r/changepassword', handler=PyglChangePassword),
     webapp2.Route(r'/r/landing', handler=PyglPageLanding),
     webapp2.Route(r'/r/report-page', handler=PyglReportAbuse),
     webapp2.Route(r'/r/delete', handler=PyglPageDelete),
@@ -803,6 +887,7 @@ app = webapp2.WSGIApplication([
     routes.DomainRoute('www.<requested_uri>.py.gl', [
     webapp2.Route(r'/edit', handler=PyglPageEdit),
     webapp2.Route(r'/r/edit', handler=PyglPageEdit),
+    webapp2.Route(r'/r/changepassword', handler=PyglChangePassword),
     webapp2.Route(r'/r/landing', handler=PyglPageLanding),
     webapp2.Route(r'/r/report-page', handler=PyglReportAbuse),
     webapp2.Route(r'/r/delete', handler=PyglPageDelete),

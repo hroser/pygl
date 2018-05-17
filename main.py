@@ -631,6 +631,22 @@ class PyglPageLanding(Handler):
 			
 		# display landing page
 		self.render('landing', page_uri=requested_uri)
+    
+    
+class PyglPageTest(Handler):
+	def get(self, requested_uri = ""):
+		# load page
+		key = ndb.Key(Pyglpage, 'pygl')
+		page = key.get()
+		# load from bucket
+		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
+		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+		gcs_file = gcs.open('/' + bucket_name + '/pages/' + str('pygl'), 'r')
+		page_text0 = b64decode(gcs_file.read()).decode('utf-8')
+		gcs_file.close()
+		
+		self.render('pagetest', page_text0=page_text0, comments_active = page.comments_active, page_views='0', page_created = page.created.date(), page_last_edit = page.last_edit.date(), pygl_uri=page.pygl_uri)
+		
         
         
 class PyglChangePassword(Handler):
@@ -894,6 +910,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/r/image', handler=GetImage),
     webapp2.Route(r'/r/upload', handler=UploadImage),
     webapp2.Route(r'/r/report-page', handler=PyglReportAbuse),
+    webapp2.Route(r'/r/testpage', handler=PyglPageTest),
     webapp2.Route(r'/r/check-url', handler=PyglCheckUrl),
     webapp2.Route(r'/<requested_uri>', handler=PyglPage),
     webapp2.Route(r'/', handler=MainPage),

@@ -134,13 +134,29 @@ class Handler(webapp2.RequestHandler):
 
 class MainPage(Handler):
 	def get(self):
-	
+		
 		landing_text = ""
 		# load from bucket
 		bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())	
 		# 'w': write (create or overwrite) 'r' (read), content_type (MIME type)
+		template_list = ['template00', 
+                    'template01', 
+                    'template02', 
+                    'template03', 
+                    'template04', 
+                    'template05', 
+                    'template06', 
+                    'template07', 
+                    'template08', 
+                    'template09']
+		loadtemplate = 'pygl'
+		if self.request.get('template'):
+			template = 'template' + self.request.get('template')
+			if template in template_list:
+				loadtemplate = template
+			
 		try:
-			gcs_file = gcs.open('/' + bucket_name + '/pages/' + 'pygl', 'r')
+			gcs_file = gcs.open('/' + bucket_name + '/pages/' + loadtemplate, 'r')
 			landing_text = b64decode(gcs_file.read()).decode('utf-8')
 			gcs_file.close()
 		except:

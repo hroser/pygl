@@ -1,0 +1,20 @@
+sudo apt-get install google-cloud-sdk
+
+sudo apt-get install google-cloud-sdk-app-engine-python
+
+sudo apt-get install google-cloud-sdk-app-engine-python google-cloud-sdk-app-engine-python-extras
+
+gcloud init
+
+gcloud app deploy app.yaml
+
+dev_appserver.py .
+
+f�r remote
+sudo dev_appserver.py . --host=0.0.0.0 --port=80 --enable_host_checking=false
+
+
+pip install WebOb
+pip install Paste
+pip install webapp2
+pip install jinja2

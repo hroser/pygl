@@ -72,6 +72,7 @@ table, tr, td {
     toolbar1: 'fontselect | fontsizeselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent',
     fontsize_formats: "8pt 10pt 11pt 12pt 14pt 18pt 24pt 36pt 48pt 72pt",
 	  image_dimensions: false,
+    nonbreaking_force_tab: true,
 
   	// enable automatic uploads of images represented by blob or data URIs
   	automatic_uploads: true,
@@ -354,13 +355,19 @@ function jumptoanchor(anchor){
 
 <body onload=jumptoanchor("{% if (status_saved == True) or (err_wrong_password == True) or (err_password_locked == True) or (err_uri_not_available == True) or (err_passwort_format == True) or (err_captcha == True)%}pub{% endif %}")>
 	<form id="edit-form" method="POST" enctype="multipart/form-data">
-		
-		
-		<br><br>
-    <center>
-    <h3>
-		In this editor you can create and customize your free website <br><br><a href="http://{{page_uri}}.py.gl" style="color: black;font-weight: bold;">{{page_uri}}.py.gl</a>:
-    </h3>
+		<br><br><br>
+		<center>
+    <div>
+				
+				<img src="https://storage.googleapis.com/pygl-page.appspot.com/res/logo_s.png" alt="py.gl Logo">
+        <br>
+        <h4>
+        Website Editor
+        </h4>
+        <br>
+        <a href="http://{{page_uri}}.py.gl" style="color: black;font-weight: bold;">{{page_uri}}.py.gl</a>
+        <br><br>
+		</div>
 		<br><br>
       {% if status_saved == True %}
         <div class = "changessaved">
